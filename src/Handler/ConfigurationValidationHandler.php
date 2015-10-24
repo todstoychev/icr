@@ -1,10 +1,9 @@
 <?php
 
-namespace Todstoychev\Icr\Validator;
+namespace Todstoychev\Icr\Handler;
 
 use Todstoychev\Icr\Exception;
-use Todstoychev\Icr\StaticData\MandatoryConfigValues;
-use Todstoychev\Icr\StaticData\Operations;
+use Todstoychev\Icr\StaticData;
 
 /**
  * Validator class used to validate the configuration
@@ -12,65 +11,8 @@ use Todstoychev\Icr\StaticData\Operations;
  * @author Todor Todorov <todstoychev@gmail.com>
  * @package Todstoychev\Icr\Validator
  */
-class ConfigurationValidator
+class ConfigurationValidationHandler extends AbstractHandler
 {
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @var string
-     */
-    protected $context;
-
-    /**
-     * @param array $config
-     * @param string $context
-     */
-    public function __construct(array $config, $context = null)
-    {
-        $this->setConfig($config);
-        $this->setContext($context);
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * @param array $config
-     * @return ConfigurationValidator
-     */
-    public function setConfig(array $config)
-    {
-        $this->config = $config;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * @param string $context
-     * @return ConfigurationValidator
-     */
-    public function setContext($context)
-    {
-        $this->context = $context;
-
-        return $this;
-    }
 
     /**
      * Validates the configuration
@@ -93,7 +35,7 @@ class ConfigurationValidator
     {
         // Check is context set
         if (!array_key_exists($this->getContext(), $this->getConfig())) {
-            throw new Exception\ContextDoesNotExistsException("Context {$this->getContext()} does not exists!");
+            throw new Exception\NonExsitingContextException("Context {$this->getContext()} does not exists!");
         }
     }
 
@@ -107,7 +49,7 @@ class ConfigurationValidator
     protected function validateConfigValues()
     {
         foreach ($this->config[$this->getContext()] as $sizeName => $values) {
-            foreach (MandatoryConfigValues::$mandatoryConfigValueKeys as $keyName) {
+            foreach (StaticData\MandatoryConfigValues::$mandatoryConfigValueKeys as $keyName) {
                 if (!array_key_exists($keyName, $values)) {
                     throw new Exception\MandatoryConfigValueMissingException(
                         "Parameter {$keyName} is not set in the configuration!"
@@ -115,7 +57,7 @@ class ConfigurationValidator
                 }
 
                 // Validate values type
-                if (!in_array($values['operation'], Operations::$allowedOperations)) {
+                if (!in_array($values['operation'], StaticData\Operations::$allowedOperations)) {
                     throw new Exception\InvalidConfigValueException(
                         'Invalid cofiguration value provided for operation!'
                     );
