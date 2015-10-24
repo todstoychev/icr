@@ -3,22 +3,17 @@
 namespace Todstoychev\Icr\Handler;
 
 /**
- * Directory handler. Provides methods to handle missing directory creation
+ * Directory handler. Provides methods to handle missing directory creation adn deleting directory and files.
  *
  * @author Todor Todorov <todstoychev@gmail.com>
  * @package Todstoychev\Icr\Handler
  */
-class DirectoryHandler
+class DirectoryHandler extends AbstractHandler
 {
-    /**
-     * @var string
-     */
-    protected $uploadsPath;
-
     /**
      * @var array
      */
-    protected $sizes;
+    protected $config;
 
     /**
      * @var string
@@ -29,47 +24,28 @@ class DirectoryHandler
      * @param string $uploadsPath
      * @param array $sizes
      */
-    public function __construct($uploadsPath, array $sizes, $context)
+    public function __construct(array $config = [], $context = '')
     {
-        $this->setUploadsPath($uploadsPath);
-        $this->setSizes($sizes);
+        $this->setConfig($config);
         $this->setContext($context);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUploadsPath()
-    {
-        return $this->uploadsPath;
-    }
-
-    /**
-     * @param string $uploadsPath
-     * @return DirectoryHandler
-     */
-    public function setUploadsPath($uploadsPath)
-    {
-        $this->uploadsPath = $uploadsPath;
-
-        return $this;
     }
 
     /**
      * @return array
      */
-    public function getSizes()
+    public function getConfig()
     {
-        return $this->sizes;
+        return $this->config;
     }
 
     /**
-     * @param array $sizes
+     * @param array $config
+     *
      * @return DirectoryHandler
      */
-    public function setSizes($sizes)
+    public function setConfig($config)
     {
-        $this->sizes = $sizes;
+        $this->config = $config;
 
         return $this;
     }
@@ -84,6 +60,7 @@ class DirectoryHandler
 
     /**
      * @param string $context
+     *
      * @return DirectoryHandler
      */
     public function setContext($context)
@@ -93,41 +70,52 @@ class DirectoryHandler
         return $this;
     }
 
-
     /**
      * Check if directory exists if not creates it. Necessary to provide the irectory structure for saving
      * the image files.
+     *
+     * @return DirectoryHandler
      */
-    public function checkAndCreateDirectory()
+    public function checkAndCreateDirectories()
     {
-        $folders = explode('/', $this->uploadsPath);
-        $path = public_path();
+        $path = public_path($this->config['uploads_path']);
 
-        // Create base dir structure
-        foreach ($folders as $folder) {
-            if (strlen($folder) > 0) {
-                $path .= '/' . $folder;
-                $this->createDirectory($path);
-            }
+        // Check and create uploads directory
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
         }
 
         // Create context directory structure
-        $this->createDirectory($path . '/' . $this->getContext());
+        mkdir($path . '/' . $this->getContext(), 0777);
 
-        foreach ($this->sizes as $size => $data) {
-            $this->createDirectory($path . '/' . $this->getContext() . '/' . $size);
+        foreach ($this->config[$this->getContext()] as $sizeName => $values) {
+            mkdir($path . '/' . $this->getContext() . '/' . $sizeName, 0777);
         }
+
+        return $this;
     }
 
     /**
-     * Creates directory if not exists
+     * Delete old files and directories in particular context. Left only the original files.
      *
-     * @param string $path Path to directory
+     * @return $this
      */
-    protected function createDirectory($path)
+    public function deleteContextFilesAndDirectories()
     {
-        if (!is_dir($path)) {
-            mkdir($path, 0755);
+        foreach ($this->config[$this->getContext()] as $sizeName => $values) {
+            $path = public_path($this->config['uploads_path'] . '/' . $this->getContext() . '/' . $sizeName);
+            if (is_dir($path)) {
+                $files = scandir($path);
+                $files = array_diff($files, ['.', '..']);
+
+                foreach ($files as $file) {
+                    unlink($path . '/' . $file);
+                }
+
+                rmdir($path);
+            }
         }
+
+        return $this;
     }
 }
