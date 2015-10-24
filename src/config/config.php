@@ -3,6 +3,19 @@
 return [
     'uploads_path' => 'uploads/images',
 
+    // Allowed filetypes necessary for validating the input image
+    'allowed_filetypes' => [
+        'image/jpeg' => [
+            'jpeg', 'jpg'
+        ],
+        'image/png' => [
+            'png',
+        ],
+        'image/gif' => [
+            'gif',
+        ]
+    ],
+
     'default' => [
         'small' => [
             'width' => 32,

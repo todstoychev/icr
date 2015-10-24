@@ -2,6 +2,7 @@
 
 namespace Todstoychev\Icr;
 
+use Illuminate\Support\Facades\Facade;
 use Imagine\Gd;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Todstoychev\Icr\Entity;
@@ -20,6 +21,10 @@ use Todstoychev\Icr\Validator\ConfigurationValidator;
  */
 class Icr
 {
+    public static function uploadImage(UploadedFile $uploadedFile, $context)
+    {
+        return app('icr.processor')->uploadImage($uploadedFile, $context);
+    }
 //    /**
 //     * @var UplodedFile
 //     */

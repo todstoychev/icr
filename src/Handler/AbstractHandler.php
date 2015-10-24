@@ -116,4 +116,22 @@ class AbstractHandler
 
         return $this->config[$context];
     }
+
+    /**
+     * Gets array of allowed mime types and extensions
+     *
+     * @example
+     * [
+     *  'image/jpeg' => [
+     *      'jpeg', 'jpg'
+     *  ],
+     * ...
+     * ]
+     *
+     * @return array
+     */
+    public function getAllowedFileTypes()
+    {
+        return $this->config['allowed_filetypes'];
+    }
 }

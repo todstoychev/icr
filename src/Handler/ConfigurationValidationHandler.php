@@ -13,39 +13,21 @@ use Todstoychev\Icr\StaticData;
  */
 class ConfigurationValidationHandler extends AbstractHandler
 {
-
-    /**
-     * Validates the configuration
-     *
-     * @throws Exception\ContextDoesNotExistsException
-     * @throws Exception\MandatoryConfigValueMissingException
-     */
-    public function validate()
+    public function validate($context)
     {
-        $this->validateContext();
-        $this->validateConfigValues();
+        $this->setContext($context)->validateContext()->validateConfigValues();
     }
 
-    /**
-     * Validates the context
-     *
-     * @throws Exception\ContextDoesNotExistsException
-     */
     protected function validateContext()
     {
         // Check is context set
         if (!array_key_exists($this->getContext(), $this->getConfig())) {
-            throw new Exception\NonExsitingContextException("Context {$this->getContext()} does not exists!");
+            throw new Exception\NonExistingContextException("Context {$this->getContext()} does not exists!");
         }
+
+        return $this;
     }
 
-    /**
-     * Validates the configuration values
-     *
-     * @todo Improve this method. Too much nested statements.
-     *
-     * @throws Exception\MandatoryConfigValueMissingException
-     */
     protected function validateConfigValues()
     {
         foreach ($this->config[$this->getContext()] as $sizeName => $values) {
@@ -58,23 +40,25 @@ class ConfigurationValidationHandler extends AbstractHandler
 
                 // Validate values type
                 if (!in_array($values['operation'], StaticData\Operations::$allowedOperations)) {
-                    throw new Exception\InvalidConfigValueException(
+                    throw new Exception\InvalidConfigurationValueException(
                         'Invalid cofiguration value provided for operation!'
                     );
                 }
 
                 if (!is_int($values['width'])) {
-                    throw new Exception\InvalidConfigValueException(
+                    throw new Exception\InvalidConfigurationValueException(
                         'Invalid configuration value provided for width!'
                     );
                 }
 
                 if (!is_int($values['height'])) {
-                    throw new Exception\InvalidConfigValueException(
+                    throw new Exception\InvalidConfigurationValueException(
                         'Invalid configuration value provided for height!'
                     );
                 }
             }
         }
+
+        return $this;
     }
 }

@@ -70,40 +70,31 @@ class DirectoryHandler extends AbstractHandler
         return $this;
     }
 
-    /**
-     * Check if directory exists if not creates it. Necessary to provide the irectory structure for saving
-     * the image files.
-     *
-     * @return DirectoryHandler
-     */
-    public function checkAndCreateDirectories()
+    public function checkAndCreateDirectories($context)
     {
-        $path = public_path($this->config['uploads_path']);
+        $this->setContext($context);
+
+        $path = public_path($this->getUploadsPath());
 
         // Check and create uploads directory
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
-        }
 
-        // Create context directory structure
-        mkdir($path . '/' . $this->getContext(), 0777);
+            // Create context directory structure
+            mkdir($path.'/'.$this->getContext(), 0777);
 
-        foreach ($this->config[$this->getContext()] as $sizeName => $values) {
-            mkdir($path . '/' . $this->getContext() . '/' . $sizeName, 0777);
+            foreach ($this->config[$this->getContext()] as $sizeName => $values) {
+                mkdir($path.'/'.$this->getContext().'/'.$sizeName, 0777);
+            }
         }
 
         return $this;
     }
 
-    /**
-     * Delete old files and directories in particular context. Left only the original files.
-     *
-     * @return $this
-     */
     public function deleteContextFilesAndDirectories()
     {
         foreach ($this->config[$this->getContext()] as $sizeName => $values) {
-            $path = public_path($this->config['uploads_path'] . '/' . $this->getContext() . '/' . $sizeName);
+            $path = public_path($this->getUploadsPath() . '/' . $this->getContext() . '/' . $sizeName);
             if (is_dir($path)) {
                 $files = scandir($path);
                 $files = array_diff($files, ['.', '..']);

@@ -1,15 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: user
- * Date: 15-10-24
- * Time: 21:34
- */
 
-namespace todstoychev\icr\src\Exception;
+namespace Todstoychev\Icr\Exception;
 
-
-class NonAllowedFileExtensionException
+class NonAllowedFileExtensionException extends \Exception
 {
 
 }
