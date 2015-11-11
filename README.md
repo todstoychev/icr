@@ -22,9 +22,7 @@ and run
 ```composer update```
 
 # Configuration
-In the ```'providers'``` section of your Laravel ```config/app.php``` add:
-
-```Todstoychev\Icr\ServiceProvider::class,```
+In the ```'providers'``` section of your Laravel ```config/app.php``` add: ```Todstoychev\Icr\ServiceProvider::class,```. 
 
 In the ```'aliases'``` you can add: ```'Icr' => \Todstoychev\Icr\Icr::class,```
 
