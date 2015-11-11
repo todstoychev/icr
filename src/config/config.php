@@ -22,24 +22,27 @@ return [
         ],
     ],
 
+    // Context output format
+    'output_format' => [
+        'default' => '.jpg',
+    ],
+
+    // Context settings
     'default' => [
         'small' => [
             'width' => 32,
             'height' => 32,
             'operation' => 'resize-crop',
-            'format' => '.jpg',
         ],
         'medium' => [
             'width' => 100,
             'height' => 100,
             'operation' => 'resize-crop',
-            'format' => '.jpg',
         ],
         'large' => [
             'width' => 200,
             'height' => 200,
             'operation' => 'resize-crop',
-            'format' => '.jpg',
         ],
     ],
 ];
