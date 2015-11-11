@@ -2,6 +2,12 @@
 
 namespace Todstoychev\Icr\Reader;
 
+/**
+ * Directory tree reader. Used to get directory and file names.
+ *
+ * @author Todor Todorov <todstoychev@gmail.com>
+ * @package Todstoychev\Icr\Reader
+ */
 class DirectoryTreeReader
 {
     /**

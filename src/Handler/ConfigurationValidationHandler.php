@@ -14,6 +14,14 @@ use Todstoychev\Icr\StaticData;
 class ConfigurationValidationHandler extends AbstractHandler
 {
 
+    /**
+     * Validates provided context name
+     *
+     * @param string $context
+     *
+     * @return ConfigurationValidationHandler
+     * @throws Exception\NonExistingContextException
+     */
     public function validateContext($context)
     {
         // Check is context set
@@ -24,6 +32,15 @@ class ConfigurationValidationHandler extends AbstractHandler
         return $this;
     }
 
+    /**
+     * Validates configuration values for provided context
+     *
+     * @param string $context
+     *
+     * @return ConfigurationValidationHandler
+     * @throws Exception\InvalidConfigurationValueException
+     * @throws Exception\MandatoryConfigValueMissingException
+     */
     public function validateConfigValues($context)
     {
         foreach ($this->config[$context] as $values) {
@@ -36,6 +53,12 @@ class ConfigurationValidationHandler extends AbstractHandler
         return $this;
     }
 
+    /**
+     * Validetes provided image library driver
+     *
+     * @return ConfigurationValidationHandler
+     * @throws Exception\InvalidConfigurationValueException
+     */
     public function validateDriver()
     {
         if (
@@ -48,6 +71,14 @@ class ConfigurationValidationHandler extends AbstractHandler
         return $this;
     }
 
+    /**
+     * Validate key value
+     *
+     * @param string $keyName
+     * @param array $values
+     *
+     * @throws Exception\MandatoryConfigValueMissingException
+     */
     protected function validateKeyValues($keyName, array $values)
     {
         if (!array_key_exists($keyName, $values)) {
@@ -57,6 +88,13 @@ class ConfigurationValidationHandler extends AbstractHandler
         }
     }
 
+    /**
+     * Validates value type
+     *
+     * @param array $values
+     *
+     * @throws Exception\InvalidConfigurationValueException
+     */
     protected function validateValuesType(array $values)
     {
         if (!in_array($values['operation'], StaticData\Operations::$allowedOperations)) {

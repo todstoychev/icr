@@ -3,12 +3,12 @@
 namespace Todstoychev\Icr\Exception;
 
 /**
- * Handles non existing context name
+ * Handles file limit exceeded error
  *
  * @author Todor Todorov <todstoychev@gmail.com>
  * @package Todstoychev\Icr\Exception
  */
-class NonExistingContextException extends \Exception
+class FileLimitExceededException extends \Exception
 {
 
 }

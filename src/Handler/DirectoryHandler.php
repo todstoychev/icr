@@ -11,6 +11,14 @@ namespace Todstoychev\Icr\Handler;
 class DirectoryHandler extends AbstractHandler
 {
 
+    /**
+     * Checks if directory exists. If directory is missing, creates it.
+     *
+     * @param string $context
+     *
+     * @return DirectoryHandler
+     * @throws \Todstoychev\Icr\Exception\NonExistingArrayKeyException
+     */
     public function checkAndCreateDirectories($context)
     {
         $path = public_path($this->getUploadsPath());
@@ -34,6 +42,14 @@ class DirectoryHandler extends AbstractHandler
         return $this;
     }
 
+    /**
+     * Delete all context files and directories in the directory tree
+     *
+     * @param string $context
+     *
+     * @return DirectoryHandler
+     * @throws \Todstoychev\Icr\Exception\NonExistingArrayKeyException
+     */
     public function deleteContextFilesAndDirectories($context)
     {
         foreach ($this->config[$context] as $sizeName => $values) {

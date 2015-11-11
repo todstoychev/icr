@@ -6,7 +6,7 @@ use Imagine\Image\Box;
 use Todstoychev\Icr\Exception\ResizeRatioException;
 
 /**
- * ResizeOperation
+ * Performs resize operation
  *
  * @author Todor Todorov <todstoychev@gmail.com> 
  * @package Todstoychev\Icr\Operation;
@@ -14,6 +14,9 @@ use Todstoychev\Icr\Exception\ResizeRatioException;
 class ResizeOperation extends AbstractOperation
 {
 
+    /**
+     * @inheritdoc
+     */
     public function doAction()
     {
         $this->getImage()->resize($this->createBox());
@@ -21,6 +24,12 @@ class ResizeOperation extends AbstractOperation
         return $this;
     }
 
+    /**
+     * Calculates resize ratio
+     *
+     * @return float
+     * @throws ResizeRatioException
+     */
     protected function calculateRatio()
     {
         $widthRatio = $this->getImage()->getSize()->getWidth() / $this->getWidth();
@@ -35,16 +44,31 @@ class ResizeOperation extends AbstractOperation
         return $ratio;
     }
 
+    /**
+     * Calculates output image width
+     *
+     * @return float
+     * @throws ResizeRatioException
+     */
     protected function calculateWidth()
     {
         return $this->getImage()->getSize()->getWidth() / $this->calculateRatio();
     }
 
+    /**
+     * Calculates output image height
+     *
+     * @return float
+     * @throws ResizeRatioException
+     */
     protected function calculateHeight()
     {
         return $this->getImage()->getSize()->getHeight() / $this->calculateRatio();
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function createBox()
     {
         return new Box($this->calculateWidth(), $this->calculateHeight());

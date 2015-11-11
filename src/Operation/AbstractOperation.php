@@ -2,8 +2,15 @@
 
 namespace Todstoychev\Icr\Operation;
 
+use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 
+/**
+ * Abstract operation class
+ *
+ * @author Todor Todorov <todstoychev@gmail.com>
+ * @package Todstoychev\Icr\Operation
+ */
 abstract class AbstractOperation
 {
 
@@ -22,6 +29,11 @@ abstract class AbstractOperation
      */
     protected $height;
 
+    /**
+     * @param ImageInterface $image
+     * @param int $width
+     * @param int $height
+     */
     public function __construct(ImageInterface $image, $width, $height)
     {
         $this->setImage($image);
@@ -89,7 +101,17 @@ abstract class AbstractOperation
         return $this;
     }
 
+    /**
+     * Performs operation action
+     *
+     * @return AbstractOperation
+     */
     abstract public function doAction();
 
+    /**
+     * Creates box object
+     *
+     * @return Box
+     */
     abstract protected function createBox();
 }

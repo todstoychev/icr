@@ -5,19 +5,19 @@ namespace Todstoychev\Icr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Todstoychev\Icr\Console\RebuildCommand;
-use Todstoychev\Icr\Handler\ConfigurationValidationHandler;
-use Todstoychev\Icr\Handler\DeleteImageHandler;
-use Todstoychev\Icr\Handler\DirectoryHandler;
-use Todstoychev\Icr\Handler\OpenImageHandler;
-use Todstoychev\Icr\Handler\UploadedFileHandler;
+use Todstoychev\Icr\Handler;
 use Todstoychev\Icr\Reader\DirectoryTreeReader;
 
+/**
+ * Service provider class
+ *
+ * @author Todor Todorov <todstoychev@gmail.com>
+ * @package Todstoychev\Icr
+ */
 class ServiceProvider extends BaseServiceProvider
 {
     /**
      * Bootstrap the application services.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -25,14 +25,12 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * Register the application services.
-     *
-     * @return void
+     * @inheritdoc
      */
     public function register()
     {
         $this->publishes([
-            __DIR__.'/config/config.php' => config_path('icr/config.php'),
+            __DIR__ . '/config/config.php' => config_path('icr/config.php'),
         ]);
 
         // Bind ICR configuration
@@ -42,35 +40,35 @@ class ServiceProvider extends BaseServiceProvider
 
         // Configuration validator
         $this->app->bind('icr.configuration_validation.handler', function () {
-            return new ConfigurationValidationHandler(
+            return new Handler\ConfigurationValidationHandler(
                 $this->app->make('icr.config')
             );
         });
 
         // Directory handler
         $this->app->bind('icr.directory.handler', function () {
-            return new DirectoryHandler(
+            return new Handler\DirectoryHandler(
                 $this->app->make('icr.config')
             );
         });
 
         // Original file handler
         $this->app->bind('icr.uploaded_file.handler', function () {
-            return new UploadedFileHandler(
+            return new Handler\UploadedFileHandler(
                 $this->app->make('icr.config')
             );
         });
 
         // Open image handler
         $this->app->bind('icr.open_image.handler', function () {
-            return new OpenImageHandler(
+            return new Handler\OpenImageHandler(
                 $this->app->make('icr.config')
             );
         });
 
         // Delete image handler
         $this->app->bind('icr.delete_image.handler', function () {
-            return new DeleteImageHandler(
+            return new Handler\DeleteImageHandler(
                 $this->app->make('icr.config')
             );
         });
@@ -103,6 +101,9 @@ class ServiceProvider extends BaseServiceProvider
         $this->commands(['icr.rebuild.command']);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function provides()
     {
         return ['icr.rebuild.command'];
