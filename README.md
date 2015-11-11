@@ -3,17 +3,18 @@ This is an image manipulation module based on the [Imagine](https://github.com/a
 # Installation
 Use the standart composer way:
 
-```composer require todstoychev/icr```
+```
+composer require todstoychev/icr
+```
 
 Or add to your composer.json:
 
-```
+```json
 "require": {
     ...
     "todstoychev/icr": "dev-master",
     ...
     }
-
 ```
 
 and run 
@@ -21,13 +22,9 @@ and run
 ```composer update```
 
 # Configuration
-In the ```'providers'``` section of your Laravel ```config/app.php``` add:
+In the ```'providers'``` section of your Laravel ```config/app.php``` add: ```Todstoychev\Icr\ServiceProvider::class,```. 
 
-```Todstoychev\Icr\ServiceProvider::class,```
-
-In the ```'aliases'``` you can add: 
-
-```'Icr' => \Todstoychev\Icr\Icr::class,```
+In the ```'aliases'``` you can add: ```'Icr' => \Todstoychev\Icr\Icr::class,```
 
 Run ```php artisan vendor:publish --provider="Todstoychev\Icr\ServiceProvider"``` to publish the config.
 
