@@ -24,14 +24,14 @@ class DeleteImageHandler extends AbstractHandler
         $contextPath = public_path($this->getUploadsPath() . '/' . $context);
 
         foreach ($this->getContextValues($context) as $key => $value) {
-            $image = $contextPath . '/' . $context  . '/' . $fileName;
+            $image = $contextPath . '/' . $key . '/' . $fileName;
 
             is_file($image) ? unlink($image) : null;
         }
     }
 
     /**
-     * Copletely deletes an image
+     * Completely deletes an image
      *
      * @param string $context
      * @param string $fileName
@@ -42,8 +42,12 @@ class DeleteImageHandler extends AbstractHandler
     {
         $this->deleteImageSizes($context, $fileName);
 
-        $originalImage = public_path($this->getUploadsPath() . '/' . $context . '/' . $fileName);
+        $fileName = preg_replace('/\.[a-z]{3,4}/', '', $fileName);
 
-        is_file($originalImage) ? unlink($originalImage) : null;
+        $path = public_path($this->getUploadsPath() . '/' . $context);
+
+        foreach (glob($path . '/' . $fileName . '*') as $file) {
+            unlink($file);
+        }
     }
 }
