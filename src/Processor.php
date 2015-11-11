@@ -201,9 +201,7 @@ class Processor
         try {
             $fileName = $this->uploadImage($uploadedFile, $context);
 
-            $this->processImage($context, $fileName);
-
-            return $fileName;
+            return $this->processImage($context, $fileName);
         } catch (\Exception $e) {
             $this->getDeleteImageHandler()->deleteImage($context, $fileName);
 
@@ -279,6 +277,8 @@ class Processor
      *
      * @param string $context
      * @param string $fileName
+     *
+     * @return string
      */
     protected function processImage($context, $fileName)
     {
@@ -300,12 +300,14 @@ class Processor
             // Perform operation and save the image
             $operation->doAction();
             $path = public_path($config['uploads_path'] . '/' . $context . '/' . $sizeName . '/' . $fileName);
-            $path = preg_replace('/\.[a-z]{3,4}$/', $values['format'], $path);
+            $path = preg_replace('/\.[a-z]{3,4}$/', $config['output_format'][$context], $path);
             $imageCopy->save($path);
 
             // Delete existing instance
             unset($imageCopy);
         }
+
+        return preg_replace('/\.[a-z]{3,4}$/', $config['output_format'][$context], $fileName);
     }
 
     /**
