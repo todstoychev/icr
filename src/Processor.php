@@ -194,7 +194,7 @@ class Processor
      *
      * @param UploadedFile $uploadedFile
      * @param string $context
-     * @return \Exception
+     * @return \Exception|string
      */
     public function upload(UploadedFile $uploadedFile, $context)
     {
@@ -202,6 +202,8 @@ class Processor
             $fileName = $this->uploadImage($uploadedFile, $context);
 
             $this->processImage($context, $fileName);
+
+            return $fileName;
         } catch (\Exception $e) {
             $this->getDeleteImageHandler()->deleteImage($context, $fileName);
 
