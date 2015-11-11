@@ -76,8 +76,8 @@ class AbstractHandler
      *
      * @return array
      */
-    public function getAllowedFileTypes()
+    public function getAllowedFileTypes($context)
     {
-        return $this->config['allowed_filetypes'];
+        return $this->config['allowed_filetypes'][$context];
     }
 }

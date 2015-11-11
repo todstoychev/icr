@@ -77,15 +77,15 @@ class UploadedFileHandler extends AbstractHandler
     public function handle(UploadedFile $uploadedFile, $context)
     {
         $this->setUploadedFile($uploadedFile);
-        $this->validateUploadedFile();
+        $this->validateUploadedFile($context);
         $this->checkFileSize();
         $this->generateFileName($context);
         $this->saveOriginalFile($context);
     }
 
-    protected function validateUploadedFile()
+    protected function validateUploadedFile($context)
     {
-        $allowedFileTypes = $this->getAllowedFileTypes();
+        $allowedFileTypes = $this->getAllowedFileTypes($context);
         $mimeType = $this->getUploadedFile()->getClientMimeType();
         $extension = $this->getUploadedFile()->getClientOriginalExtension();
 
@@ -94,7 +94,9 @@ class UploadedFileHandler extends AbstractHandler
         }
 
         if (!in_array($extension, $allowedFileTypes[$mimeType])) {
-            throw new Exception\NonAllowedFileExtensionException('File extension did not match the file mime type or it is not allowed!');
+            throw new Exception\NonAllowedFileExtensionException(
+                'File extension did not match the file mime type or it is not allowed!'
+            );
         }
 
         return $this;
