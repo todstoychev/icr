@@ -27,7 +27,7 @@ return [
         'default' => '.jpg',
     ],
 
-    // Context settings
+    // Context settings. Allowed operations: crop, resize, scale, resize-crop.
     'default' => [
         'small' => [
             'width' => 32,

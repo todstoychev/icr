@@ -22,6 +22,10 @@ class ServiceProvider extends BaseServiceProvider
     public function boot()
     {
         $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'icr');
+
+        $this->publishes([
+            __DIR__ . '/config/config.php' => config_path('icr/config.php'),
+        ]);
     }
 
     /**
@@ -29,13 +33,9 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->publishes([
-            __DIR__ . '/config/config.php' => config_path('icr/config.php'),
-        ]);
-
         // Bind ICR configuration
         $this->app->bind('icr.config', function () {
-            return Config::get('icr.config');
+            return 'icr.config';
         });
 
         // Configuration validator

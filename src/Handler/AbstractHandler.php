@@ -2,6 +2,7 @@
 
 namespace Todstoychev\Icr\Handler;
 
+use Illuminate\Support\Facades\Config;
 use Todstoychev\Icr\Exception;
 
 /**
@@ -18,9 +19,9 @@ class AbstractHandler
     protected $config;
 
     /**
-     * @param array $config
+     * @param string $config
      */
-    public function __construct(array $config = [])
+    public function __construct($config = '')
     {
         $this->setConfig($config);
     }
@@ -34,13 +35,13 @@ class AbstractHandler
     }
 
     /**
-     * @param array $config
+     * @param string $config
      *
      * @return BaseHandler
      */
     public function setConfig($config)
     {
-        $this->config = $config;
+        $this->config = Config::get($config);
 
         return $this;
     }
