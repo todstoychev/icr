@@ -4,6 +4,13 @@ namespace Todstoychev\Icr\Handler;
 
 use Todstoychev\Icr\Exception\ExtensionNotFoundException;
 
+/**
+ * Handles existing image openning and creates the necessary image object, depending on the driver set
+ * in the configuration.
+ *
+ * @author Todor Todorov <todstoychev@gmail.com>
+ * @package Todstoychev\Icr\Handler
+ */
 class OpenImageHandler extends AbstractHandler
 {
     /**

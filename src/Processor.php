@@ -7,6 +7,12 @@ use Todstoychev\Icr;
 use Todstoychev\Icr\Handler;
 use Todstoychev\Icr\Reader\DirectoryTreeReader;
 
+/**
+ * Used to perform main operations
+ *
+ * @author Todor Todorov <todstoychev@gmail.com>
+ * @package Todstoychev\Icr
+ */
 class Processor
 {
     /**
@@ -39,6 +45,14 @@ class Processor
      */
     protected $directoryTreeReader;
 
+    /**
+     * @param Handler\ConfigurationValidationHandler $configurationValidationHandler
+     * @param Handler\DirectoryHandler $directoryHandler
+     * @param Handler\UploadedFileHandler $uploadedFileHandler
+     * @param Handler\OpenImageHandler $openImageHandler
+     * @param Handler\DeleteImageHandler $deleteImageHandler
+     * @param DirectoryTreeReader $directoryTreeReader
+     */
     public function __construct(
         Handler\ConfigurationValidationHandler $configurationValidationHandler,
         Handler\DirectoryHandler $directoryHandler,
@@ -175,6 +189,13 @@ class Processor
         return $this;
     }
 
+    /**
+     * Handles image upload operation
+     *
+     * @param UploadedFile $uploadedFile
+     * @param string $context
+     * @return \Exception
+     */
     public function upload(UploadedFile $uploadedFile, $context)
     {
         try {
@@ -188,12 +209,25 @@ class Processor
         }
     }
 
+    /**
+     * Handles image delete operation
+     *
+     * @param string $fileName
+     * @param string $context
+     * @throws Exception\NonExistingContextException
+     */
     public function delete($fileName, $context)
     {
         $this->getConfigurationValidationHandler()->validateContext($context);
         $this->getDeleteImageHandler()->deleteImage($context, $fileName);
     }
 
+    /**
+     * Handles image rebuilding for particular context
+     *
+     * @param string $context
+     * @throws Exception\NonExistingArrayKeyException
+     */
     public function rebuild($context)
     {
         $this->getDirectoryHandler()->deleteContextFilesAndDirectories($context)->checkAndCreateDirectories($context);
@@ -209,6 +243,16 @@ class Processor
         }
     }
 
+    /**
+     * Handles original image uploading process
+     *
+     * @param UploadedFile $uploadedFile
+     * @param string $context
+     *
+     * @return string
+     * @throws Exception\InvalidConfigurationValueException
+     * @throws Exception\NonExistingContextException
+     */
     protected function uploadImage(UploadedFile $uploadedFile, $context)
     {
         // Validate configuration data
@@ -228,6 +272,12 @@ class Processor
         return $fileName;
     }
 
+    /**
+     * Processes single image
+     *
+     * @param string $context
+     * @param string $fileName
+     */
     protected function processImage($context, $fileName)
     {
         $config = $this->getOpenImageHandler()->getConfig();
@@ -256,6 +306,13 @@ class Processor
         }
     }
 
+    /**
+     * Creates operation class name. Used to determine dynamic the operation class name.
+     *
+     * @param string $operation
+     *
+     * @return string
+     */
     protected function createOperationClassName($operation)
     {
         $array = explode('-', $operation);

@@ -3,7 +3,8 @@
 namespace Todstoychev\Icr\StaticData;
 
 /**
- * Class Drivers
+ * Represents available image resize drivers
+ *
  * @package Todstoychev\Icr\StaticData
  * @author Todor Todorov <todstoychev@gmail.com>
  */

@@ -3,7 +3,7 @@
 namespace Todstoychev\Icr\StaticData;
 
 /**
- * Represent operations
+ * Represent available operation names
  *
  * @author Todor Todorov <todstoychev@gmail.com>
  * @package Todstoychev\Icr\StaticData

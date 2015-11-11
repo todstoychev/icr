@@ -5,9 +5,18 @@ namespace Todstoychev\Icr\Operation;
 use Imagine\Image\Box;
 use Imagine\Image\Point;
 
+/**
+ * Performs crop image operation
+ *
+ * @author Todor Todorov <todstoychev@gmail.com>
+ * @package Todstoychev\Icr\Operation
+ */
 class CropOperation extends AbstractOperation
 {
 
+    /**
+     * @inheritdoc
+     */
     public function doAction()
     {
         $this->getImage()->crop($this->createCropPoint(), $this->createBox());
@@ -15,11 +24,19 @@ class CropOperation extends AbstractOperation
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function createBox()
     {
         return new Box($this->getWidth(), $this->getHeight());
     }
 
+    /**
+     * Creates point object representing the crop start point.
+     *
+     * @return Point
+     */
     protected function createCropPoint()
     {
         $imageWidth = $this->getImage()->getSize()->getWidth();

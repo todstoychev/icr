@@ -5,6 +5,12 @@ namespace Todstoychev\Icr\Console;
 use Illuminate\Console\Command;
 use Todstoychev\Icr\Processor;
 
+/**
+ * Rebuild images in particular context.
+ *
+ * @author Todor Todorov <todstoychev@gmail.com>
+ * @package Todstoychev\Icr\Console
+ */
 class RebuildCommand extends Command
 {
 

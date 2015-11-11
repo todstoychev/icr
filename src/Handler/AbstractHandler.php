@@ -45,6 +45,12 @@ class AbstractHandler
         return $this;
     }
 
+    /**
+     * Gets the uploads path parameter from configuration
+     *
+     * @return string
+     * @throws Exception\NonExistingArrayKeyException
+     */
     public function getUploadsPath()
     {
         if (!array_key_exists('uploads_path', $this->getConfig())) {
@@ -54,10 +60,18 @@ class AbstractHandler
         return $this->config['uploads_path'];
     }
 
+    /**
+     * Gets the context values array
+     *
+     * @param $context
+     *
+     * @return array
+     * @throws Exception\NonExistingContextException
+     */
     public function getContextValues($context)
     {
         if (!array_key_exists($context, $this->config)) {
-            throw new Exception\NonExsitingContextException("No context values found for '{$context}'");
+            throw new Exception\NonExistingContextException("No context values found for '{$context}'");
         }
 
         return $this->config[$context];

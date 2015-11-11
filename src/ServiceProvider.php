@@ -8,12 +8,16 @@ use Todstoychev\Icr\Console\RebuildCommand;
 use Todstoychev\Icr\Handler;
 use Todstoychev\Icr\Reader\DirectoryTreeReader;
 
+/**
+ * Service provider class
+ *
+ * @author Todor Todorov <todstoychev@gmail.com>
+ * @package Todstoychev\Icr
+ */
 class ServiceProvider extends BaseServiceProvider
 {
     /**
      * Bootstrap the application services.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -21,9 +25,7 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * Register the application services.
-     *
-     * @return void
+     * @inheritdoc
      */
     public function register()
     {
@@ -99,6 +101,9 @@ class ServiceProvider extends BaseServiceProvider
         $this->commands(['icr.rebuild.command']);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function provides()
     {
         return ['icr.rebuild.command'];
