@@ -2,6 +2,9 @@
 
 return [
     'uploads_path' => 'uploads/images',
+    
+    // Driver to use for creating the image object @example 'gd' or 'imagick' or 'gmagick'
+    'driver' => 'gd',
 
     // Allowed filetypes necessary for validating the input image
     'allowed_filetypes' => [
@@ -20,17 +23,20 @@ return [
         'small' => [
             'width' => 32,
             'height' => 32,
-            'operation' => 'resize-crop'
+            'operation' => 'resize-crop',
+            'format' => '.jpg'
         ],
         'medium' => [
-            'width' => 200,
-            'height' => 200,
-            'operation' => 'resize-crop'
+            'width' => 100,
+            'height' => 100,
+            'operation' => 'resize-crop',
+            'format' => '.jpg'
         ],
         'large' => [
-            'width' => 400,
-            'height' => 400,
-            'operation' => 'resize-crop'
+            'width' => 200,
+            'height' => 200,
+            'operation' => 'resize-crop',
+            'format' => '.jpg'
         ],
     ]
 ];

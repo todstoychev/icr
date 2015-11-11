@@ -4,13 +4,13 @@ namespace Todstoychev\Icr;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Todstoychev\Icr\Console\Commands\RebuildImages;
+use Todstoychev\Icr\Console\RebuildCommand;
 use Todstoychev\Icr\Handler\ConfigurationValidationHandler;
+use Todstoychev\Icr\Handler\DeleteImageHandler;
 use Todstoychev\Icr\Handler\DirectoryHandler;
-use Todstoychev\Icr\Handler\OriginalImageHandler;
-use Todstoychev\Icr\Handler\RebuildImagesHandler;
+use Todstoychev\Icr\Handler\OpenImageHandler;
+use Todstoychev\Icr\Handler\UploadedFileHandler;
 use Todstoychev\Icr\Reader\DirectoryTreeReader;
-use Todstoychev\Icr\Validator\ConfigurationValidator;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -35,7 +35,7 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__.'/config/config.php' => config_path('icr/config.php'),
         ]);
 
-        // Bind ICR cofiguration
+        // Bind ICR configuration
         $this->app->bind('icr.config', function () {
             return Config::get('icr.config');
         });
@@ -55,24 +55,56 @@ class ServiceProvider extends BaseServiceProvider
         });
 
         // Original file handler
-        $this->app->bind('icr.original_image.handler', function () {
-            return new OriginalImageHandler(
+        $this->app->bind('icr.uploaded_file.handler', function () {
+            return new UploadedFileHandler(
                 $this->app->make('icr.config')
             );
         });
 
+        // Open image handler
+        $this->app->bind('icr.open_image.handler', function () {
+            return new OpenImageHandler(
+                $this->app->make('icr.config')
+            );
+        });
+
+        // Delete image handler
+        $this->app->bind('icr.delete_image.handler', function () {
+            return new DeleteImageHandler(
+                $this->app->make('icr.config')
+            );
+        });
+
+        // Directory tree reader
+        $this->app->bind('icr.directory_tree.reader', function () {
+            return new DirectoryTreeReader();
+        });
+
         // ICR main processor class
-        $this->app->bind('icr.processor', function() {
+        $this->app->bind('icr.processor', function () {
             return new Processor(
                 $this->app->make('icr.configuration_validation.handler'),
                 $this->app->make('icr.directory.handler'),
-                $this->app->make('icr.original_image.handler')
+                $this->app->make('icr.uploaded_file.handler'),
+                $this->app->make('icr.open_image.handler'),
+                $this->app->make('icr.delete_image.handler'),
+                $this->app->make('icr.directory_tree.reader')
             );
         });
+
+        // Rebuild command
+        $this->app->bind('icr.rebuild.command', function () {
+            return new RebuildCommand(
+                $this->app->make('icr.processor')
+            );
+        });
+
+        // Commands
+        $this->commands(['icr.rebuild.command']);
     }
 
     public function provides()
     {
-        return ['command.rebuild_images'];
+        return ['icr.rebuild.command'];
     }
 }

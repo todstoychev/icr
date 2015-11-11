@@ -3,44 +3,60 @@
 namespace Todstoychev\Icr;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Todstoychev\Icr\Handler\ConfigurationValidationHandler;
-use Todstoychev\Icr\Handler\DirectoryHandler;
-use Todstoychev\Icr\Handler\OriginalImageHandler;
+use Todstoychev\Icr;
+use Todstoychev\Icr\Handler;
+use Todstoychev\Icr\Reader\DirectoryTreeReader;
 
 class Processor
 {
     /**
-     * @var ConfigurationValidationHandler
+     * @var Handler\ConfigurationValidationHandler
      */
     protected $configurationValidationHandler;
 
     /**
-     * @var DirectoryHandler
+     * @var Handler\DirectoryHandler
      */
     protected $directoryHandler;
 
     /**
-     * @var OriginalImageHandler
+     * @var Handler\UploadedFileHandler
      */
-    protected $originalImageHandler;
+    protected $uploadedFileHandler;
 
     /**
-     * @var string
+     * @var Handler\OpenImageHandler
      */
-    protected $context;
+    protected $openImageHandler;
+
+    /**
+     * @var Handler\DeleteImageHandler
+     */
+    protected $deleteImageHandler;
+
+    /**
+     * @var DirectoryTreeReader
+     */
+    protected $directoryTreeReader;
 
     public function __construct(
-        ConfigurationValidationHandler $configurationValidationHandler,
-        DirectoryHandler $directoryHandler,
-        OriginalImageHandler $originalImageHandler
+        Handler\ConfigurationValidationHandler $configurationValidationHandler,
+        Handler\DirectoryHandler $directoryHandler,
+        Handler\UploadedFileHandler $uploadedFileHandler,
+        Handler\OpenImageHandler $openImageHandler,
+        Handler\DeleteImageHandler $deleteImageHandler,
+        DirectoryTreeReader $directoryTreeReader
     ) {
         $this->setConfigurationValidationHandler($configurationValidationHandler);
         $this->setDirectoryHandler($directoryHandler);
-        $this->setOriginalImageHandler($originalImageHandler);
+        $this->setUploadedFileHandler($uploadedFileHandler);
+        $this->setOpenImageHandler($openImageHandler);
+        $this->setDeleteImageHandler($deleteImageHandler);
+        $this->setDirectoryTreeReader($directoryTreeReader);
     }
 
     /**
-     * @return ConfigurationValidationHandler
+     * @return Handler\ConfigurationValidationHandler
      */
     public function getConfigurationValidationHandler()
     {
@@ -48,19 +64,20 @@ class Processor
     }
 
     /**
-     * @param ConfigurationValidationHandler $configurationValidationHandler
+     * @param Handler\ConfigurationValidationHandler $configurationValidationHandler
      *
      * @return Processor
      */
-    public function setConfigurationValidationHandler(ConfigurationValidationHandler $configurationValidationHandler)
-    {
+    public function setConfigurationValidationHandler(
+        Handler\ConfigurationValidationHandler $configurationValidationHandler
+    ) {
         $this->configurationValidationHandler = $configurationValidationHandler;
 
         return $this;
     }
 
     /**
-     * @return DirectoryHandler
+     * @return Handler\DirectoryHandler
      */
     public function getDirectoryHandler()
     {
@@ -68,11 +85,11 @@ class Processor
     }
 
     /**
-     * @param DirectoryHandler $directoryHandler
+     * @param Handler\DirectoryHandler $directoryHandler
      *
      * @return Processor
      */
-    public function setDirectoryHandler(DirectoryHandler $directoryHandler)
+    public function setDirectoryHandler(Handler\DirectoryHandler $directoryHandler)
     {
         $this->directoryHandler = $directoryHandler;
 
@@ -80,63 +97,175 @@ class Processor
     }
 
     /**
-     * @return OriginalImageHandler
+     * @return Handler\UploadedFileHandler
      */
-    public function getOriginalImageHandler()
+    public function getUploadedFileHandler()
     {
-        return $this->originalImageHandler;
+        return $this->uploadedFileHandler;
     }
 
     /**
-     * @param OriginalImageHandler $originalImageHandler
+     * @param Handler\UploadedFileHandler $uploadedFileHandler
      *
      * @return Processor
      */
-    public function setOriginalImageHandler(OriginalImageHandler $originalImageHandler)
+    public function setUploadedFileHandler(Handler\UploadedFileHandler $uploadedFileHandler)
     {
-        $this->originalImageHandler = $originalImageHandler;
+        $this->uploadedFileHandler = $uploadedFileHandler;
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return Handler\OpenImageHandler
      */
-    public function getContext()
+    public function getOpenImageHandler()
     {
-        return $this->context;
+        return $this->openImageHandler;
     }
 
     /**
-     * @param string $context
-     *
+     * @param Handler\OpenImageHandler $openImageHandler
      * @return Processor
      */
-    public function setContext($context)
+    public function setOpenImageHandler(Handler\OpenImageHandler $openImageHandler)
     {
-        $this->context = $context;
+        $this->openImageHandler = $openImageHandler;
 
         return $this;
     }
 
-    public function uploadImage(UploadedFile $uploadedFile, $context)
+    /**
+     * @return Handler\DeleteImageHandler
+     */
+    public function getDeleteImageHandler()
     {
-        $this->setContext($context);
+        return $this->deleteImageHandler;
+    }
 
+    /**
+     * @param Handler\DeleteImageHandler $deleteImageHandler
+     *
+     * @return Processor
+     */
+    public function setDeleteImageHandler(Handler\DeleteImageHandler $deleteImageHandler)
+    {
+        $this->deleteImageHandler = $deleteImageHandler;
+
+        return $this;
+    }
+
+    /**
+     * @return DirectoryTreeReader
+     */
+    public function getDirectoryTreeReader()
+    {
+        return $this->directoryTreeReader;
+    }
+
+    /**
+     * @param DirectoryTreeReader $directoryTreeReader
+     *
+     * @return Processor
+     */
+    public function setDirectoryTreeReader(DirectoryTreeReader $directoryTreeReader)
+    {
+        $this->directoryTreeReader = $directoryTreeReader;
+
+        return $this;
+    }
+
+    public function upload(UploadedFile $uploadedFile, $context)
+    {
         try {
-            // Validate configuration data
-            $this->getConfigurationValidationHandler()->setContext($this->getContext())->validate($this->getContext());
+            $fileName = $this->uploadImage($uploadedFile, $context);
 
-            // Check the directories structure
-            $this->getDirectoryHandler()->checkAndCreateDirectories($this->getContext());
-
-            // Generate name and save the original image file
-            $this->getOriginalImageHandler()->handle($uploadedFile);
-
+            $this->processImage($context, $fileName);
         } catch (\Exception $e) {
-            return $e->getMessage();
+            $this->getDeleteImageHandler()->deleteImage($context, $fileName);
+
+            return $e;
+        }
+    }
+
+    public function delete($fileName, $context)
+    {
+        $this->getConfigurationValidationHandler()->validateContext($context);
+        $this->getDeleteImageHandler()->deleteImage($context, $fileName);
+    }
+
+    public function rebuild($context)
+    {
+        $this->getDirectoryHandler()->deleteContextFilesAndDirectories($context)->checkAndCreateDirectories($context);
+
+        $path = public_path($this->getDirectoryHandler()->getUploadsPath() . '/' . $context);
+
+        $this->getDirectoryTreeReader()->setPath($path)->read();
+
+        $fileNames = $this->getDirectoryTreeReader()->getFileNames();
+
+        foreach ($fileNames as $fileName) {
+            $this->processImage($context, $fileName);
+        }
+    }
+
+    protected function uploadImage(UploadedFile $uploadedFile, $context)
+    {
+        // Validate configuration data
+        $this->getConfigurationValidationHandler()
+            ->validateConfigValues($context)
+            ->validateContext($context)
+            ->validateDriver();
+
+        // Check the directories structure
+        $this->getDirectoryHandler()->checkAndCreateDirectories($context);
+
+        // Generate name and save the original image file
+        $this->getUploadedFileHandler()->handle($uploadedFile, $context);
+
+        $fileName = $this->getUploadedFileHandler()->getFileName();
+
+        return $fileName;
+    }
+
+    protected function processImage($context, $fileName)
+    {
+        $config = $this->getOpenImageHandler()->getConfig();
+
+        $image = $this->getOpenImageHandler()->openImage($context, $fileName);
+
+        foreach ($config[$context] as $sizeName => $values) {
+            $imageCopy = $image->copy();
+
+            // Form operation name name
+            $operationClassName = $this->createOperationClassName($values['operation']);
+
+            $operationClassName = '\Todstoychev\Icr\Operation\\' . $operationClassName;
+
+            // Create class instance
+            $operation = new $operationClassName($imageCopy, $values['width'], $values['height']);
+
+            // Perform operation and save the image
+            $operation->doAction();
+            $path = public_path($config['uploads_path'] . '/' . $context . '/' . $sizeName . '/' . $fileName);
+            $path = preg_replace('/\.[a-z]{3,4}$/', $values['format'], $path);
+            $imageCopy->save($path);
+
+            // Delete existing instance
+            unset($imageCopy);
+        }
+    }
+
+    protected function createOperationClassName($operation)
+    {
+        $array = explode('-', $operation);
+
+        foreach ($array as $key => $value) {
+            $array[$key] = ucfirst($value);
         }
 
-        // Perform operations
+        $state = implode('', $array);
+
+        return $state . 'Operation';
     }
 }

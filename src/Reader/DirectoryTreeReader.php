@@ -19,6 +19,9 @@ class DirectoryTreeReader
      */
     protected $directoryNames = [];
 
+    /**
+     * @param string $path
+     */
     public function __construct($path = '')
     {
         $this->setPath($path);
@@ -35,7 +38,7 @@ class DirectoryTreeReader
     /**
      * @param string $path
      *
-     * @return FilenamesReader
+     * @return DirectoryTreeReader
      */
     public function setPath($path)
     {
@@ -60,6 +63,14 @@ class DirectoryTreeReader
         return $this->directoryNames;
     }
 
+    /**
+     * Read directory names and existing file names. Ignores duplicated. Directory names can be called with
+     * @example $this->getDirectoryNames()
+     * File names can be called with
+     * @example $this->getFileNames()
+     *
+     * @return DirectoryTreeReader
+     */
     public function read()
     {
         $directoryIterator = new \RecursiveDirectoryIterator($this->getPath());
@@ -68,12 +79,15 @@ class DirectoryTreeReader
         $array = [];
 
         foreach ($objects as $splFileInfo) {
-            if ($splFileInfo->isDir() && !preg_match('/\./', $splFileInfo->getFileName())) {
+            if ($splFileInfo->isDir() && !preg_match('/\.$/', $splFileInfo->getFileName())) {
                 $this->directoryNames[] = $splFileInfo->getFileName();
                 continue;
             }
 
-            if (!in_array($splFileInfo->getFileName(), $this->fileNames)) {
+            if (
+                !in_array($splFileInfo->getFileName(), $this->fileNames) &&
+                !preg_match('/\.$/', $splFileInfo->getFileName())
+            ) {
                 $this->fileNames[] = $splFileInfo->getFileName();
             }
         }

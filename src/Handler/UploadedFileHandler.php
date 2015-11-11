@@ -3,11 +3,9 @@
 namespace Todstoychev\Icr\Handler;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Todstoychev\Icr\Exception\FileLimitExeededException;
-use Todstoychev\Icr\Exception\NonAllowedFileExtensionException;
-use Todstoychev\Icr\Exception\NonAllowedMimeTypeException;
+use Todstoychev\Icr\Exception;
 
-class OriginalImageHandler extends AbstractHandler
+class UploadedFileHandler extends AbstractHandler
 {
     /**
      * @var UploadedFile
@@ -30,7 +28,7 @@ class OriginalImageHandler extends AbstractHandler
     /**
      * @param UploadedFile $uploadedFile
      *
-     * @return OriginalImageHandler
+     * @return UploadedFileHandler
      */
     public function setUploadedFile(UploadedFile $uploadedFile)
     {
@@ -50,7 +48,7 @@ class OriginalImageHandler extends AbstractHandler
     /**
      * @param string $fileName
      *
-     * @return OriginalImageHandler
+     * @return UploadedFileHandler
      */
     public function setFileName($fileName)
     {
@@ -59,13 +57,30 @@ class OriginalImageHandler extends AbstractHandler
         return $this;
     }
 
-    public function handle(UploadedFile $uploadedFile)
+    public function getUploadedFileWidth()
+    {
+
+    }
+
+    public function getUploadedFileHeight()
+    {
+
+    }
+
+    public function getUploadedFileDimensions()
+    {
+        list($width, $height) = getimagesize($this->getUploadedFile());
+
+        var_dump($width);
+    }
+
+    public function handle(UploadedFile $uploadedFile, $context)
     {
         $this->setUploadedFile($uploadedFile);
         $this->validateUploadedFile();
         $this->checkFileSize();
-        $this->generateFileName();
-        $this->saveOriginalFile();
+        $this->generateFileName($context);
+        $this->saveOriginalFile($context);
     }
 
     protected function validateUploadedFile()
@@ -75,11 +90,11 @@ class OriginalImageHandler extends AbstractHandler
         $extension = $this->getUploadedFile()->getClientOriginalExtension();
 
         if (!array_key_exists($mimeType, $allowedFileTypes)) {
-            throw new NonAllowedMimeTypeException('Mime type not allowed!');
+            throw new Exception\NonAllowedMimeTypeException('Mime type not allowed!');
         }
 
         if (!in_array($extension, $allowedFileTypes[$mimeType])) {
-            throw new NonAllowedFileExtensionException('File extension did not match the file mime type or it is not allowed!');
+            throw new Exception\NonAllowedFileExtensionException('File extension did not match the file mime type or it is not allowed!');
         }
 
         return $this;
@@ -91,28 +106,27 @@ class OriginalImageHandler extends AbstractHandler
         $mb = str_replace('M', '', $phpIni);
         $bytes = $mb * 1048576;
         if ($this->getUploadedFile()->getSize() > $bytes) {
-            throw new FileLimitExeededException('File too large');
+            throw new Exception\FileLimitExeededException('File too large');
         }
         return $this;
     }
 
-    protected function generateFileName()
+    protected function generateFileName($context)
     {
         $extension = $this->getUploadedFile()->getClientOriginalExtension();
         $fileName = md5(microtime()) . '.' . $extension;
-        $path = public_path($this->getUploadsPath() . '/' . $this->getContext() . '/' . $fileName);
+        $path = public_path($this->getUploadsPath() . '/' . $context . '/' . $fileName);
         if (is_file($path)) {
-            $this->generateFileName();
+            $this->generateFileName($context);
         }
         $this->setFileName($fileName);
         return $this;
     }
 
-    protected function saveOriginalFile()
+    protected function saveOriginalFile($context)
     {
-        $path = public_path($this->getUploadsPath() . '/' . $this->getContext());
+        $path = public_path($this->getUploadsPath() . '/' . $context);
         $this->uploadedFile->move($path, $this->getFileName());
         return $this;
     }
-
 }

@@ -18,17 +18,10 @@ class AbstractHandler
     protected $config;
 
     /**
-     * @var string
-     */
-    protected $context;
-
-    /**
      * @param array $config
-     * @param string $context
      */
-    public function __construct(array $config = [], $context = '')
+    public function __construct(array $config = [])
     {
-        $this->setContext($context);
         $this->setConfig($config);
     }
 
@@ -52,31 +45,6 @@ class AbstractHandler
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * @param string $context
-     *
-     * @return BaseHandler
-     */
-    public function setContext($context)
-    {
-        $this->context = $context;
-
-        return $this;
-    }
-
-    /**
-     * Gets the uploads path set in the configuration
-     *
-     * @return string
-     */
     public function getUploadsPath()
     {
         if (!array_key_exists('uploads_path', $this->getConfig())) {
@@ -86,30 +54,8 @@ class AbstractHandler
         return $this->config['uploads_path'];
     }
 
-    /**
-     * Get context values array. The context values array contains data for the image sizes, width, height and etc.
-     * @example
-     * [
-     *  'large' => [
-     *      'width' => 2000,
-     *      'height' => 3000,
-     *      'operation' => 'resize'
-     *  ],
-     *  'medium' => [
-     *      ...
-     *  ],
-     *  ...
-     * ]
-     *
-     * @param string $context
-     *
-     * @return array
-     * @throws NonExsitingContextException
-     */
-    public function getContextValues($context = '')
+    public function getContextValues($context)
     {
-        $context = (empty($context)) ? $this->getContext() : $context;
-
         if (!array_key_exists($context, $this->config)) {
             throw new Exception\NonExsitingContextException("No context values found for '{$context}'");
         }

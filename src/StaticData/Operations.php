@@ -19,6 +19,6 @@ class Operations
         'crop',
         'resize',
         'resize-crop',
-        'resize-proportional'
+        'scale'
     ];
 }
