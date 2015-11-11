@@ -13,11 +13,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class Icr
 {
     /**
-     * Handles upload image
+     * Handles upload image. Returns exception instance on error or file name on success.
      *
      * @param UploadedFile $uploadedFile
      * @param string $context
-     * @return mixed
+     * @return \Exception|string
      */
     public static function uploadImage(UploadedFile $uploadedFile, $context)
     {
@@ -25,7 +25,7 @@ class Icr
     }
 
     /**
-     * Handles delete image
+     * Handles delete image. Returns exception instance on error.
      *
      * @param string $fileName
      * @param string $context
