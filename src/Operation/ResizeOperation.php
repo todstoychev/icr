@@ -38,7 +38,7 @@ class ResizeOperation extends AbstractOperation
         $ratio = min($widthRatio, $heightRatio);
 
         if ($ratio < 1) {
-            throw new ResizeRatioException('Your image is too small. Try with larger image.');
+            throw new ResizeRatioException(trans('icr::exceptions.image_too_small'));
         }
 
         return $ratio;

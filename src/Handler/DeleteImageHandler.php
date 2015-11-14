@@ -26,7 +26,9 @@ class DeleteImageHandler extends AbstractHandler
         foreach ($this->getContextValues($context) as $key => $value) {
             $image = $contextPath . '/' . $key . '/' . $fileName;
 
-            is_file($image) ? unlink($image) : null;
+            if (file_exists($image)) {
+                unlink($image);
+            }
         }
     }
 

@@ -55,7 +55,7 @@ class AbstractHandler
     public function getUploadsPath()
     {
         if (!array_key_exists('uploads_path', $this->getConfig())) {
-            throw new Exception\NonExistingArrayKeyException('Array key "uploads_path" not set in configuration array!');
+            throw new Exception\NonExistingArrayKeyException(trans('icr::exceptions.uploads_path_missing'));
         }
 
         return $this->config['uploads_path'];
@@ -72,7 +72,7 @@ class AbstractHandler
     public function getContextValues($context)
     {
         if (!array_key_exists($context, $this->config)) {
-            throw new Exception\NonExistingContextException("No context values found for '{$context}'");
+            throw new Exception\NonExistingContextException(trans('icr::exceptions.missing_context', ['context' => $context]));
         }
 
         return $this->config[$context];
