@@ -22,9 +22,11 @@ class ServiceProvider extends BaseServiceProvider
     public function boot()
     {
         $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'icr');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'icr');
 
         $this->publishes([
             __DIR__ . '/config/config.php' => config_path('icr/config.php'),
+            __DIR__ . '/../resources/lang' => base_path('resources/lang/todstoychev/icr')
         ]);
     }
 

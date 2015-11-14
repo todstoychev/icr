@@ -48,7 +48,7 @@ class OpenImageHandler extends AbstractHandler
         $extension = array_shift($matches);
 
         if (empty($extension)) {
-            throw new ExtensionNotFoundException('Extension not found in path!');
+            throw new ExtensionNotFoundException(trans('icr::exceptions.extension_not_found'));
         }
 
         $extension = str_replace('.', '', $extension);

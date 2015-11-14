@@ -26,7 +26,7 @@ class ConfigurationValidationHandler extends AbstractHandler
     {
         // Check is context set
         if (!array_key_exists($context, $this->getConfig())) {
-            throw new Exception\NonExistingContextException("Context {$context} does not exists!");
+            throw new Exception\NonExistingContextException(trans('icr::exceptions.missing_context', ['context' => $context]));
         }
 
         return $this;
@@ -65,7 +65,7 @@ class ConfigurationValidationHandler extends AbstractHandler
             !array_key_exists('driver', $this->getConfig()) ||
             !in_array($this->config['driver'], StaticData\Drivers::$allowedDrivers)
         ) {
-            throw new Exception\InvalidConfigurationValueException('Invalid or missing driver configuration value!');
+            throw new Exception\InvalidConfigurationValueException(trans('icr::exceptions.invalid_image_driver'));
         }
 
         return $this;
@@ -82,9 +82,7 @@ class ConfigurationValidationHandler extends AbstractHandler
     protected function validateKeyValues($keyName, array $values)
     {
         if (!array_key_exists($keyName, $values)) {
-            throw new Exception\MandatoryConfigValueMissingException(
-                "Parameter {$keyName} is not set in the configuration!"
-            );
+            throw new Exception\MandatoryConfigValueMissingException(trans('icr::exceptions.missing_parameter', ['name' => $keyName]));
         }
     }
 
@@ -99,19 +97,19 @@ class ConfigurationValidationHandler extends AbstractHandler
     {
         if (!in_array($values['operation'], StaticData\Operations::$allowedOperations)) {
             throw new Exception\InvalidConfigurationValueException(
-                'Invalid configuration value provided for operation!'
+                trans('icr::exceptions.invalid_config_value', ['name' => 'operation'])
             );
         }
 
         if (!is_int($values['width'])) {
             throw new Exception\InvalidConfigurationValueException(
-                'Invalid configuration value provided for width!'
+                trans('icr::exceptions.invalid_config_value', ['name' => 'width'])
             );
         }
 
         if (!is_int($values['height'])) {
             throw new Exception\InvalidConfigurationValueException(
-                'Invalid configuration value provided for height!'
+                trans('icr::exceptions.invalid_config_value', ['name' => 'height'])
             );
         }
     }

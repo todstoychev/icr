@@ -98,13 +98,11 @@ class UploadedFileHandler extends AbstractHandler
         $extension = $this->getUploadedFile()->getClientOriginalExtension();
 
         if (!array_key_exists($mimeType, $allowedFileTypes)) {
-            throw new Exception\NonAllowedMimeTypeException('Mime type not allowed!');
+            throw new Exception\NonAllowedMimeTypeException(trans('icr::exceptions.mimetype_not_allowed'));
         }
 
         if (!in_array($extension, $allowedFileTypes[$mimeType])) {
-            throw new Exception\NonAllowedFileExtensionException(
-                'File extension did not match the file mime type or it is not allowed!'
-            );
+            throw new Exception\NonAllowedFileExtensionException(trans('icr::exceptions.file_extension_did_not_match'));
         }
 
         return $this;
@@ -122,7 +120,7 @@ class UploadedFileHandler extends AbstractHandler
         $mb = str_replace('M', '', $phpIni);
         $bytes = $mb * 1048576;
         if ($this->getUploadedFile()->getSize() > $bytes) {
-            throw new Exception\FileLimitExceededException('File too large');
+            throw new Exception\FileLimitExceededException(trans('icr::exceptions.file_limit_exceeded'));
         }
         return $this;
     }
