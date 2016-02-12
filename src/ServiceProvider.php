@@ -2,7 +2,6 @@
 
 namespace Todstoychev\Icr;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Todstoychev\Icr\Console\RebuildCommand;
 use Todstoychev\Icr\Handler;
