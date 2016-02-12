@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/todstoychev/icr.svg?branch=master)](https://travis-ci.org/todstoychev/icr)
+
 This is an image manipulation module based on the [Imagine](https://github.com/avalanche123/Imagine) module. It is for Laravel 5.* php framework.
 
 # Installation
