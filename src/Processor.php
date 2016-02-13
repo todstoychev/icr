@@ -226,6 +226,8 @@ class Processor
      * Handles image rebuilding for particular context
      *
      * @param string $context
+     *
+     * @return bool
      * @throws Exception\NonExistingArrayKeyException
      */
     public function rebuild($context)
@@ -241,6 +243,8 @@ class Processor
         foreach ($fileNames as $fileName) {
             $this->processImage($context, $fileName);
         }
+
+        return true;
     }
 
     /**

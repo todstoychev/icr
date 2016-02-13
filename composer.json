@@ -26,6 +26,9 @@
         "laravel/framework": "5.*",
         "imagine/imagine": "~0.5.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
     "autoload": {
         "psr-4": {
             "Todstoychev\\Icr\\": "src/"
@@ -33,7 +36,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Todstoychev\\Icr\\Tests": "tests/"
+            "Todstoychev\\Icr\\Tests\\": "tests/"
         }
     }
 }

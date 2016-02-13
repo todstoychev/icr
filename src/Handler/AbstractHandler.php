@@ -19,9 +19,9 @@ class AbstractHandler
     protected $config;
 
     /**
-     * @param string $config
+     * @param array $config
      */
-    public function __construct($config = '')
+    public function __construct($config = [])
     {
         $this->setConfig($config);
     }
@@ -35,13 +35,13 @@ class AbstractHandler
     }
 
     /**
-     * @param string $config
+     * @param array $config
      *
-     * @return BaseHandler
+     * @return AbstractHandler
      */
     public function setConfig($config)
     {
-        $this->config = Config::get($config);
+        $this->config = $config;
 
         return $this;
     }
