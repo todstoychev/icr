@@ -71,7 +71,7 @@ class RebuildCommand extends Command
         $context = $this->ask('Provide context to rebuild', 'default');
 
         try {
-            $this->getProcessor()->rebuild($context);
+            return $this->getProcessor()->rebuild($context);
         } catch (\Exception $e) {
             $this->error("\n\n\t" . $e->getMessage() . "\n");
         }
