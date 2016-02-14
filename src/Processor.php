@@ -156,7 +156,7 @@ class Processor
      *
      * @return Processor
      */
-    protected function processSizes($file, $fileName, $context, $extension, FileManager $fileManager)
+    public function processSizes($file, $fileName, $context, $extension, FileManager $fileManager)
     {
         foreach ($this->config[$context] as $sizeName => $values) {
             $image = $this->openImageHandler->loadImage($file);
