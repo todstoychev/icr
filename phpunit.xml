@@ -1,6 +1,6 @@
-<phpunit bootstrap="vendor/autoload.php">
+<phpunit bootstrap="../../../vendor/autoload.php">
     <testsuites>
-        <testsuite name="icr">
+        <testsuite name="image-manipulator">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

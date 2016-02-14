@@ -2,13 +2,14 @@
 
 namespace Todstoychev\Icr\Exception;
 
+
 /**
- * Handles missing array key exception
+ * Handles image not set error
  *
  * @package Todstoychev\Icr\Exception
  * @author Todor Todorov <todstoychev@gmail.com>
  */
-class NonExistingArrayKeyException extends \LogicException
+class ImageNotSetException extends \RuntimeException
 {
 
 }

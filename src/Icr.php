@@ -2,37 +2,24 @@
 
 namespace Todstoychev\Icr;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Todstoychev\Icr\Handler\OpenImage;
+use Todstoychev\Icr\Manipulator\ManipulatorFactory;
+
 
 /**
- * Module main class
+ * Class Icr
  *
- * @author Todor Todorov <todstoychev@gmail.com>
  * @package Todstoychev\Icr
+ * @author Todor Todorov <todstoychev@gmail.com>
  */
 class Icr
 {
-    /**
-     * Handles upload image. Returns exception instance on error or file name on success.
-     *
-     * @param UploadedFile $uploadedFile
-     * @param string $context
-     * @return \Exception|string
-     */
-    public static function uploadImage(UploadedFile $uploadedFile, $context)
-    {
-        return app('icr.processor')->upload($uploadedFile, $context);
-    }
+    protected $config;
 
-    /**
-     * Handles delete image. Returns exception instance on error.
-     *
-     * @param string $fileName
-     * @param string $context
-     * @return mixed
-     */
-    public static function deleteImage($fileName, $context)
+    protected $context;
+
+    public function __construct(array $config, $context)
     {
-        return app('icr.processor')->delete($fileName, $context);
+        $this->config = $config;
     }
 }

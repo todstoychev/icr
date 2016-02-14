@@ -1,15 +1,6 @@
 {
     "name": "todstoychev/icr",
-    "type": "library",
-    "description": "Image crop resizer based on Imagine module",
-    "keywords": [
-        "image",
-        "resizer",
-        "imagine",
-        "crop",
-        "scale",
-        "image manipulation"
-    ],
+    "description": "Image manipulation and upload module",
     "homepage": "https://github.com/todstoychev/icr",
     "license": "MIT",
     "authors": [
@@ -18,16 +9,13 @@
             "email": "todstoychev@gmail.com"
         }
     ],
-    "support": {
-        "email": "todstoychev@gmail.com"
-    },
     "require": {
-        "php": ">=5.4",
-        "laravel/framework": "5.*",
-        "imagine/imagine": "~0.5.0"
+        "php": ">5.5.9",
+        "imagine/imagine": "0.6.*",
+        "laravel/framework": ">5.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.0"
+        "phpunit/phpunit": "^5.2"
     },
     "autoload": {
         "psr-4": {
