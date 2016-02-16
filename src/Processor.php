@@ -3,14 +3,9 @@
 namespace Todstoychev\Icr;
 
 use Illuminate\Filesystem\FilesystemAdapter;
-use Illuminate\Support\Facades\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Todstoychev\Icr\Handler\OpenImage;
+use Todstoychev\Icr\Handler\OpenImageHandler;
 use Todstoychev\Icr\Manager\FileManager;
-use Todstoychev\Icr\Manager\UniqueFileNameGenerator;
-use Todstoychev\Icr\Manipulator\Box;
 use Todstoychev\Icr\Manipulator\ManipulatorFactory;
-use Todstoychev\Icr\Manipulator\Point;
 
 /**
  * Processes images.
@@ -31,39 +26,51 @@ class Processor
     protected $manipulatorFactory;
 
     /**
-     * @var OpenImage
+     * @var OpenImageHandler
      */
     protected $openImageHandler;
 
     /**
-     * @param array $config
+     * @var FileManager
      */
-    public function __construct(array $config)
-    {
+    protected $fileManager;
+
+    /**
+     * @param array $config
+     * @param ManipulatorFactory $manipulatorFactory
+     * @param OpenImageHandler $openImageHandler
+     * @param FileManager $fileManager
+     */
+    public function __construct(
+        array $config,
+        ManipulatorFactory $manipulatorFactory,
+        OpenImageHandler $openImageHandler,
+        FileManager $fileManager
+    ) {
         $this->config = $config;
-        $this->manipulatorFactory = new ManipulatorFactory(new Box, new Point());
-        $this->openImageHandler = new OpenImage($this->config['image_adapter']);
+        $this->manipulatorFactory = $manipulatorFactory;
+        $this->openImageHandler = $openImageHandler;
+        $this->openImageHandler->setImageLibrary($this->config['image_adapter']);
+        $this->fileManager = $fileManager;
     }
 
     /**
      * Handles image upload
      *
      * @param string $context
-     * @param UploadedFile $uploadedFile
+     * @param string $file
+     * @param string $extension
      * @param FilesystemAdapter $filesystemAdapter
      *
      * @return string
      */
-    public function upload($context, UploadedFile $uploadedFile, FilesystemAdapter $filesystemAdapter)
+    public function upload($context, $file, $extension, FilesystemAdapter $filesystemAdapter)
     {
-        $file = File::get($uploadedFile);
-        $extension = $uploadedFile->getClientOriginalExtension();
-        $fileManager = new FileManager($filesystemAdapter, new UniqueFileNameGenerator());
-
         // Upload original image
-        $fileName = $fileManager->uploadFile($file, $extension, $context);
+        $fileName = $this->fileManager->setFileSystemAdapter($filesystemAdapter)
+            ->uploadFile($file, $extension, $context);
 
-        $this->processSizes($file, $fileName, $context, $extension, $fileManager);
+        $this->processSizes($file, $fileName, $context, $extension, $this->fileManager);
 
         return $fileName;
     }
@@ -107,8 +114,8 @@ class Processor
 
         // Rebuild sizes
         $this->deleteSizes($fileName, $context, $filesystemAdapter);
-        $fileManager = new FileManager($filesystemAdapter, new UniqueFileNameGenerator());
-        $this->processSizes($originalImage, $fileName, $context, $extension, $fileManager);
+        $this->fileManager->setFileSystemAdapter($filesystemAdapter);
+        $this->processSizes($originalImage, $fileName, $context, $extension, $this->fileManager);
 
         return true;
     }
@@ -124,10 +131,10 @@ class Processor
      */
     protected function deleteSizes($fileName, $context, FilesystemAdapter $filesystemAdapter)
     {
-        $fileManager = new FileManager($filesystemAdapter, new UniqueFileNameGenerator());
+        $this->fileManager->setFileSystemAdapter($filesystemAdapter);
 
         foreach ($this->config[$context] as $sizeName => $values) {
-            $path = $fileManager->path($context, $sizeName);
+            $path = $this->fileManager->path($context, $sizeName);
             $filesystemAdapter->delete($path . $fileName);
         }
 
@@ -155,11 +162,11 @@ class Processor
      * @param string $fileName File name
      * @param string $context File context
      * @param string $extension File extension
-     * @param FileManager $fileManager
+     * @param FilesystemAdapter $filesystemAdapter
      *
      * @return Processor
      */
-    public function processSizes($file, $fileName, $context, $extension, FileManager $fileManager)
+    public function processSizes($file, $fileName, $context, $extension, FilesystemAdapter $filesystemAdapter)
     {
         foreach ($this->config[$context] as $sizeName => $values) {
             $image = $this->openImageHandler->loadImage($file);
@@ -171,7 +178,8 @@ class Processor
             );
             $image = $operation->manipulate();
 
-            $fileManager->uploadImage($image, $extension, $context, $sizeName, $fileName);
+            $this->fileManager->setFileSystemAdapter($filesystemAdapter)
+                ->uploadImage($image, $extension, $context, $sizeName, $fileName);
         }
 
         return $this;

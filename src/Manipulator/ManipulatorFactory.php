@@ -33,19 +33,14 @@ class ManipulatorFactory
     }
 
     /**
-     * Creates operation instance
+     * @param string $operation Operation name
      *
-     * @param AbstractImage $abstractImage
-     * @param string $operation
-     * @param int $width
-     * @param int $height
-     *
-     * @return ManipulatorFactory
+     * @return mixed
      */
-    public function create(AbstractImage $abstractImage, $operation, $width, $height)
+    public function create($operation)
     {
         $className = "Todstoychev\\Icr\\Manipulator\\" . ucfirst($operation);
 
-        return new $className($abstractImage, $width, $height, $this->box, $this->point);
+        return new $className($this->box, $this->point);
     }
 }

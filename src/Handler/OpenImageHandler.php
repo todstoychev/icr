@@ -13,7 +13,7 @@ use Imagine\Imagick\Imagine as ImagickImage;
  * @package Todstoychev\Icr\Handler
  * @author Todor Todorov <todstoychev@gmail.com>
  */
-class OpenImage
+class OpenImageHandler
 {
     /**
      * @var string
@@ -49,7 +49,7 @@ class OpenImage
     /**
      * @param string $imageLibrary
      *
-     * @return OpenImage
+     * @return OpenImageHandler
      */
     public function setImageLibrary($imageLibrary)
     {

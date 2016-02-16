@@ -5,7 +5,7 @@ namespace Todstoychev\Icr\Manager;
 use Illuminate\Filesystem\FilesystemAdapter;
 
 /**
- * Class FileManager
+ * File manager class
  *
  * @package Todstoychev\Icr
  * @author Todor Todorov <todstoychev@gmail.com>
@@ -18,14 +18,15 @@ class FileManager
     protected $filesystemAdapter;
 
     /**
-     * @var UniqueFileNameGenerator
+     * @param FilesystemAdapter $filesystemAdapter
+     *
+     * @return FileManager
      */
-    protected $uniqueFileNameGenerator;
-
-    public function __construct(FilesystemAdapter $filesystemAdapter, UniqueFileNameGenerator $uniqueFileNameGenerator)
+    public function setFileSystemAdapter(FilesystemAdapter $filesystemAdapter)
     {
         $this->filesystemAdapter = $filesystemAdapter;
-        $this->uniqueFileNameGenerator = $uniqueFileNameGenerator;
+
+        return $this;
     }
 
     /**
@@ -42,7 +43,7 @@ class FileManager
     public function uploadFile($file, $extension, $context = null, $sizeName = null, $fileName = null)
     {
         $path = $this->path($context, $sizeName);
-        $hash = $this->uniqueFileNameGenerator->generate($this->filesystemAdapter, $extension, $path);
+        $hash = $this->generate($this->filesystemAdapter, $extension, $path);
 
         if (null === $fileName) {
             $fileName = $hash . '.' . $extension;
@@ -70,5 +71,27 @@ class FileManager
         $path .= (null !== $sizeName) ? $sizeName . '/' : null;
 
         return $path;
+    }
+
+    /**
+     * Generates unique filename
+     *
+     * @param FilesystemAdapter $filesystemAdapter
+     * @param string $extension File extension
+     * @param null|string $path Directory path
+     *
+     * @return string
+     */
+    public function generate(FilesystemAdapter $filesystemAdapter, $extension, $path = null)
+    {
+        $hash = sha1(time() + microtime());
+
+        $exists = $filesystemAdapter->exists($path . '/' . $hash . '.' . $extension);
+
+        if ($exists) {
+            $this->generate($filesystemAdapter, $extension, $path);
+        }
+
+        return $hash;
     }
 }
