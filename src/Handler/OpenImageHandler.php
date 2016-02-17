@@ -6,6 +6,7 @@ use Imagine\Gd\Imagine as GdImage;
 use Imagine\Gmagick\Imagine as GmagickImage;
 use Imagine\Image\AbstractImage;
 use Imagine\Imagick\Imagine as ImagickImage;
+use Todstoychev\Icr\Exception\IcrRuntimeException;
 
 /**
  * Opens image with Imagine
@@ -39,14 +40,6 @@ class OpenImageHandler
     }
 
     /**
-     * @return string
-     */
-    public function getImageLibrary()
-    {
-        return $this->imageLibrary;
-    }
-
-    /**
      * @param string $imageLibrary
      *
      * @return OpenImageHandler
@@ -71,6 +64,10 @@ class OpenImageHandler
         $functionName = 'loadWith' . $imageLibrary;
         $this->image = $image;
 
+        if (!method_exists($this, $functionName)) {
+            throw new IcrRuntimeException('Wrong image library name provided!');
+        }
+
         return call_user_func([$this, $functionName]);
     }
 
@@ -86,6 +83,10 @@ class OpenImageHandler
         $imageLibrary = ucfirst($this->imageLibrary);
         $functionName = 'openWith' . $imageLibrary;
         $this->path = $path;
+
+        if (!method_exists($this, $functionName)) {
+            throw new IcrRuntimeException('Wrong image library name provided!');
+        }
 
         return call_user_func([$this, $functionName]);
     }
