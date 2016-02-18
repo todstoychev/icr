@@ -3,6 +3,7 @@
 namespace Todstoychev\Icr\Manager;
 
 use Illuminate\Filesystem\FilesystemAdapter;
+use Todstoychev\Icr\Exception\IcrRuntimeException;
 
 /**
  * File manager class
@@ -42,10 +43,14 @@ class FileManager
      */
     public function uploadFile($file, $extension, $context = null, $sizeName = null, $fileName = null)
     {
+        if (!$this->filesystemAdapter instanceof FilesystemAdapter) {
+            throw new IcrRuntimeException('File manager has no file system adapter no set!');
+        }
+
         $path = $this->path($context, $sizeName);
-        $hash = $this->generate($this->filesystemAdapter, $extension, $path);
 
         if (null === $fileName) {
+            $hash = $this->generate($this->filesystemAdapter, $extension, $path);
             $fileName = $hash . '.' . $extension;
         }
 
