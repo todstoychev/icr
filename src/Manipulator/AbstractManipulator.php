@@ -3,9 +3,7 @@
 namespace Todstoychev\Icr\Manipulator;
 
 use Imagine\Image\AbstractImage;
-use Imagine\Image\ImageInterface;
 use Imagine\Image\Point;
-use Todstoychev\Icr\Exception\ImageNotSetException;
 use Todstoychev\Icr\Exception\ImageTooSmallException;
 
 /**

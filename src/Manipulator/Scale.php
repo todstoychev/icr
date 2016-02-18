@@ -14,15 +14,12 @@ class Scale extends AbstractManipulator
 {
     /**
      * {@inheritdoc}
-     *
-     * @return AbstractImage;
      */
-    public function manipulate()
+    public function manipulate(AbstractImage $image, $width, $height)
     {
-        $this->checkImage();
-        $this->box->setHeight($this->height)
-            ->setWidth($this->width);
+        $this->box->setHeight($height)
+            ->setWidth($width);
 
-        return $this->image->resize($this->box);
+        return $image->resize($this->box);
     }
 }

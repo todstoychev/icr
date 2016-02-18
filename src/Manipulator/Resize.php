@@ -17,11 +17,10 @@ class Resize extends AbstractManipulator
      *
      * @return AbstractImage
      */
-    public function manipulate()
+    public function manipulate(AbstractImage $image, $width, $height)
     {
-        $this->checkImage();
-        $this->calculateResize($this->width, $this->height);
+        $this->calculateResize($image, $width, $height);
 
-        return $this->image->resize($this->box);
+        return $image->resize($this->box);
     }
 }

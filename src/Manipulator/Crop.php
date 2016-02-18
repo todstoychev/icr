@@ -2,6 +2,7 @@
 
 namespace Todstoychev\Icr\Manipulator;
 
+use Imagine\Image\AbstractImage;
 use Imagine\Image\Point;
 
 /**
@@ -14,15 +15,13 @@ class Crop extends AbstractManipulator
 {
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function manipulate()
+    public function manipulate(AbstractImage $image, $width, $height)
     {
-        $this->createCropPoint($this->width, $this->height);
-        $this->box->setHeight($this->height)
-            ->setWidth($this->width);
+        $this->createCropPoint($image, $width, $height);
+        $this->box->setHeight($height)
+            ->setWidth($width);
 
-        return $this->image->crop($this->point, $this->box);
+        return $image->crop($this->point, $this->box);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Todstoychev\Icr\Manipulator;
 
+use Imagine\Image\AbstractImage;
+
 /**
  * Class ResizeCrop
  *
@@ -12,19 +14,16 @@ class ResizeCrop extends AbstractManipulator
 {
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function manipulate()
+    public function manipulate(AbstractImage $image, $width, $height)
     {
-        $this->checkImage();
-        $this->calculateResize($this->width, $this->height);
-        $this->image->resize($this->box);
+        $box = $this->calculateResize($image, $width, $height);
+        $image = $image->resize($box);
 
-        $this->createCropPoint($this->width, $this->height);
-        $this->box->setWidth($this->width)
-            ->setHeight($this->height);
+        $point = $this->createCropPoint($image, $width, $height);
+        $this->box->setWidth($width)
+            ->setHeight($height);
 
-        return $this->image->crop($this->point, $this->box);
+        return $image->crop($point, $this->box);
     }
 }
