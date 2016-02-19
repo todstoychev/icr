@@ -5,6 +5,7 @@ namespace Todstoychev\Icr\Manipulator;
 use Imagine\Image\BoxInterface;
 use Imagine\Image\PointInterface;
 use InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * Custom implementation of the imagine box interface
@@ -32,6 +33,14 @@ class Box implements BoxInterface
      */
     public function __construct($width = 0, $height = 0)
     {
+        if (!is_numeric($width) || !is_numeric($height)) {
+            throw new LogicException('Provided scale ration is NaN!');
+        }
+
+        if ($width < 0 || $height < 0) {
+            throw new LogicException('Scale ratio is negative!');
+        }
+
         $this->width  = (int) $width;
         $this->height = (int) $height;
     }
@@ -51,6 +60,10 @@ class Box implements BoxInterface
      */
     public function setWidth($width)
     {
+        if (!is_numeric($width)) {
+            throw new LogicException('Box width is NaN!');
+        }
+
         $this->width = $width;
 
         return $this;
@@ -71,6 +84,10 @@ class Box implements BoxInterface
      */
     public function setHeight($height)
     {
+        if (!is_numeric($height)) {
+            throw new LogicException('Box height is NaN!');
+        }
+
         $this->height = $height;
 
         return $this;
@@ -81,6 +98,14 @@ class Box implements BoxInterface
      */
     public function scale($ratio)
     {
+        if (!is_numeric($ratio)) {
+            throw new LogicException('Provided scale ration is NaN!');
+        }
+
+        if ($ratio < 0) {
+            throw new LogicException('Scale ratio is negative!');
+        }
+
         $this->checkAttributes();
 
         return new Box(round($ratio * $this->width), round($ratio * $this->height));
@@ -91,7 +116,20 @@ class Box implements BoxInterface
      */
     public function increase($size)
     {
-        $this->checkAttributes();
+        if (!is_numeric($size)) {
+            throw new LogicException('Increase size is NaN!');
+        }
+
+        $width = (int) $size + $this->width;
+        $height = (int) $size + $this->height;
+
+        if ($width < 0) {
+            throw new LogicException('Provided increase size produces negative width!');
+        }
+
+        if ($height < 0) {
+            throw new LogicException('Provided increase size produces negative width!');
+        }
 
         return new Box((int) $size + $this->width, (int) $size + $this->height);
     }
@@ -101,11 +139,11 @@ class Box implements BoxInterface
      */
     public function contains(BoxInterface $box, PointInterface $start = null)
     {
-        $this->checkAttributes();
+        $start = (null !== $start) ? $start : new Point(new Box(0, 0));
 
-        $start = $start ? $start : new Point(0, 0);
-
-        return $start->in($this) && $this->width >= $box->getWidth() + $start->getX() && $this->height >= $box->getHeight() + $start->getY();
+        return $start->in($this) &&
+            $this->width >= $box->getWidth() + $start->getX() &&
+            $this->height >= $box->getHeight() + $start->getY();
     }
 
     /**
@@ -113,8 +151,6 @@ class Box implements BoxInterface
      */
     public function square()
     {
-        $this->checkAttributes();
-
         return $this->width * $this->height;
     }
 
@@ -131,6 +167,14 @@ class Box implements BoxInterface
      */
     public function widen($width)
     {
+        if (!is_numeric($width)) {
+            throw new LogicException('Provided width is NaN!');
+        }
+
+        if ($width < 0) {
+            throw new LogicException('Width can not be negative!');
+        }
+
         $this->checkAttributes();
 
         return $this->scale($width / $this->width);
@@ -141,6 +185,14 @@ class Box implements BoxInterface
      */
     public function heighten($height)
     {
+        if (!is_numeric($height)) {
+            throw new LogicException('Provided height is NaN!');
+        }
+
+        if ($height < 0) {
+            throw new \LogicException('Height can not be negative!');
+        }
+
         $this->checkAttributes();
 
         return $this->scale($height / $this->height);
