@@ -3,7 +3,6 @@
 namespace Todstoychev\Icr\Manipulator;
 
 use Imagine\Image\AbstractImage;
-use Imagine\Image\Point;
 use Todstoychev\Icr\Exception\ImageTooSmallException;
 
 /**
@@ -139,9 +138,8 @@ abstract class AbstractManipulator
         $box = clone $this->box;
         $box->setWidth(round($cropWidth))
             ->setHeight(round($cropHeight));
-        $point = clone $this->point;
-        $point->setBox($box);
+        $this->point->setBox($box);
 
-        return $point;
+        return $this->point;
     }
 }

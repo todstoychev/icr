@@ -5,7 +5,6 @@ namespace Todstoychev\Icr\Manipulator;
 use Imagine\Image\BoxInterface;
 use Imagine\Image\PointInterface;
 use InvalidArgumentException;
-use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * Custom implementation of the imagine box interface
@@ -34,11 +33,11 @@ class Box implements BoxInterface
     public function __construct($width = 0, $height = 0)
     {
         if (!is_numeric($width) || !is_numeric($height)) {
-            throw new LogicException('Provided scale ration is NaN!');
+            throw new \LogicException('Provided scale ration is NaN!');
         }
 
         if ($width < 0 || $height < 0) {
-            throw new LogicException('Scale ratio is negative!');
+            throw new \LogicException('Scale ratio is negative!');
         }
 
         $this->width  = (int) $width;
@@ -61,7 +60,7 @@ class Box implements BoxInterface
     public function setWidth($width)
     {
         if (!is_numeric($width)) {
-            throw new LogicException('Box width is NaN!');
+            throw new \LogicException('Box width is NaN!');
         }
 
         $this->width = $width;
@@ -85,7 +84,7 @@ class Box implements BoxInterface
     public function setHeight($height)
     {
         if (!is_numeric($height)) {
-            throw new LogicException('Box height is NaN!');
+            throw new \LogicException('Box height is NaN!');
         }
 
         $this->height = $height;
@@ -99,11 +98,11 @@ class Box implements BoxInterface
     public function scale($ratio)
     {
         if (!is_numeric($ratio)) {
-            throw new LogicException('Provided scale ration is NaN!');
+            throw new \LogicException('Provided scale ration is NaN!');
         }
 
         if ($ratio < 0) {
-            throw new LogicException('Scale ratio is negative!');
+            throw new \LogicException('Scale ratio is negative!');
         }
 
         $this->checkAttributes();
@@ -117,18 +116,18 @@ class Box implements BoxInterface
     public function increase($size)
     {
         if (!is_numeric($size)) {
-            throw new LogicException('Increase size is NaN!');
+            throw new \LogicException('Increase size is NaN!');
         }
 
         $width = (int) $size + $this->width;
         $height = (int) $size + $this->height;
 
         if ($width < 0) {
-            throw new LogicException('Provided increase size produces negative width!');
+            throw new \LogicException('Provided increase size produces negative width!');
         }
 
         if ($height < 0) {
-            throw new LogicException('Provided increase size produces negative width!');
+            throw new \LogicException('Provided increase size produces negative width!');
         }
 
         return new Box((int) $size + $this->width, (int) $size + $this->height);
@@ -168,11 +167,11 @@ class Box implements BoxInterface
     public function widen($width)
     {
         if (!is_numeric($width)) {
-            throw new LogicException('Provided width is NaN!');
+            throw new \LogicException('Provided width is NaN!');
         }
 
         if ($width < 0) {
-            throw new LogicException('Width can not be negative!');
+            throw new \LogicException('Width can not be negative!');
         }
 
         $this->checkAttributes();
@@ -186,7 +185,7 @@ class Box implements BoxInterface
     public function heighten($height)
     {
         if (!is_numeric($height)) {
-            throw new LogicException('Provided height is NaN!');
+            throw new \LogicException('Provided height is NaN!');
         }
 
         if ($height < 0) {

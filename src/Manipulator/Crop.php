@@ -3,7 +3,6 @@
 namespace Todstoychev\Icr\Manipulator;
 
 use Imagine\Image\AbstractImage;
-use Imagine\Image\Point;
 
 /**
  * Handles crop operation
