@@ -4,6 +4,7 @@ namespace Todstoychev\Icr\Manipulator;
 
 use Imagine\Image\BoxInterface;
 use Imagine\Image\PointInterface;
+use Todstoychev\Icr\Exception\IcrRuntimeException;
 
 /**
  * Class Point
@@ -45,7 +46,9 @@ class Point implements PointInterface
      */
     public function getX()
     {
-        return ceil($this->box->getWidth() / 2);
+        $this->checkBoxInstance();
+
+        return $this->box->getWidth();
     }
 
     /**
@@ -53,7 +56,9 @@ class Point implements PointInterface
      */
     public function getY()
     {
-        return ceil($this->box->getHeight() / 2);
+        $this->checkBoxInstance();
+
+        return $this->box->getHeight();
     }
 
     /**
@@ -61,6 +66,8 @@ class Point implements PointInterface
      */
     public function in(BoxInterface $box)
     {
+        $this->checkBoxInstance();
+
         return $this->getX() < $box->getWidth() && $this->getY() < $box->getHeight();
     }
 
@@ -69,7 +76,14 @@ class Point implements PointInterface
      */
     public function move($amount)
     {
-        return new Point($this->getX() + $amount, $this->getY() + $amount);
+        $x = $this->getX() + $amount;
+        $y = $this->getY() + $amount;
+
+        if ($x < 0 || $y < 0) {
+            throw new \LogicException('Can not move with negative result!');
+        }
+
+        return new Point(new Box($x, $y));
     }
 
     /**
@@ -78,5 +92,15 @@ class Point implements PointInterface
     public function __toString()
     {
         return sprintf('(%d, %d)', $this->getX(), $this->getY());
+    }
+
+    /**
+     * Checks is box instance set
+     */
+    protected function checkBoxInstance()
+    {
+        if (!$this->box instanceof Box) {
+            throw new IcrRuntimeException('Box instance not set!');
+        }
     }
 }
