@@ -3,6 +3,7 @@
 namespace Todstoychev\Icr\Manipulator;
 
 use Imagine\Image\AbstractImage;
+use Todstoychev\Icr\Exception\IcrRuntimeException;
 
 /**
  * Factory used to produce manipulation class instance
@@ -33,13 +34,23 @@ class ManipulatorFactory
     }
 
     /**
+     * Creates manipulation instance
+     *
      * @param string $operation Operation name
      *
      * @return mixed
      */
     public function create($operation)
     {
-        $className = "Todstoychev\\Icr\\Manipulator\\" . ucfirst($operation);
+        if (!is_string($operation)) {
+            throw new \LogicException("Provided manipulation name {$operation} is not a string!");
+        }
+
+        $className = "Todstoychev\\Icr\\Manipulator\\" . ucfirst(strtolower($operation));
+
+        if (!class_exists($className)) {
+            throw new IcrRuntimeException("Operation {$operation} dies not exists!");
+        }
 
         return new $className($this->box, $this->point);
     }
