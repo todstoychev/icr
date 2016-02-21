@@ -115,7 +115,7 @@ class Processor
         // Rebuild sizes
         $this->deleteSizes($fileName, $context, $filesystemAdapter);
         $this->fileManager->setFileSystemAdapter($filesystemAdapter);
-        $this->processSizes($originalImage, $fileName, $context, $extension, $this->fileManager);
+        $this->processSizes($originalImage, $fileName, $context, $extension, $filesystemAdapter);
 
         return true;
     }
@@ -171,15 +171,12 @@ class Processor
         foreach ($this->config[$context] as $sizeName => $values) {
             $image = $this->openImageHandler->loadImage($file);
             $operation = $this->manipulatorFactory->create(
-                $image,
-                $values['operation'],
-                $values['width'],
-                $values['height']
+                $values['operation']
             );
-            $image = $operation->manipulate();
+            $image = $operation->manipulate($image, $values['width'], $values['height']);
 
             $this->fileManager->setFileSystemAdapter($filesystemAdapter)
-                ->uploadImage($image, $extension, $context, $sizeName, $fileName);
+                ->uploadFile($image, $extension, $context, $sizeName, $fileName);
         }
 
         return $this;
