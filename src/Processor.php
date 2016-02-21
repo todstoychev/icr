@@ -3,6 +3,7 @@
 namespace Todstoychev\Icr;
 
 use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Facades\Config;
 use Todstoychev\Icr\Handler\OpenImageHandler;
 use Todstoychev\Icr\Manager\FileManager;
 use Todstoychev\Icr\Manipulator\ManipulatorFactory;
@@ -36,18 +37,18 @@ class Processor
     protected $fileManager;
 
     /**
-     * @param array $config
+     * @param Config $config
      * @param ManipulatorFactory $manipulatorFactory
      * @param OpenImageHandler $openImageHandler
      * @param FileManager $fileManager
      */
     public function __construct(
-        array $config,
+        Config $config,
         ManipulatorFactory $manipulatorFactory,
         OpenImageHandler $openImageHandler,
         FileManager $fileManager
     ) {
-        $this->config = $config;
+        $this->config = $config::get('icr');
         $this->manipulatorFactory = $manipulatorFactory;
         $this->openImageHandler = $openImageHandler;
         $this->openImageHandler->setImageLibrary($this->config['image_adapter']);
@@ -70,7 +71,7 @@ class Processor
         $fileName = $this->fileManager->setFileSystemAdapter($filesystemAdapter)
             ->uploadFile($file, $extension, $context);
 
-        $this->processSizes($file, $fileName, $context, $extension, $this->fileManager);
+        $this->processSizes($file, $fileName, $context, $extension, $filesystemAdapter);
 
         return $fileName;
     }
