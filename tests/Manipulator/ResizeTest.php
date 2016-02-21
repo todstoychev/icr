@@ -7,12 +7,12 @@ use Imagine\Image\AbstractImage;
 use Todstoychev\Icr\Manipulator;
 
 /**
- * Class CropTest
+ * Class ResizeTest
  *
  * @package Todstoychev\Icr\Tests\Manipulator
  * @author Todor Todorov <todstoychev@gmail.com>
  */
-class CropTest extends \PHPUnit_Framework_TestCase
+class ResizeTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var AbstractImage
@@ -20,9 +20,9 @@ class CropTest extends \PHPUnit_Framework_TestCase
     protected $image;
 
     /**
-     * @var Manipulator\Crop
+     * @var Manipulator\Resize
      */
-    protected $crop;
+    protected $resize;
 
     /**
      * @var string
@@ -36,7 +36,7 @@ class CropTest extends \PHPUnit_Framework_TestCase
     {
         $this->image = new Imagine();
         $this->path = __DIR__ . '/../fixtures/test_image.png';
-        $this->crop = new Manipulator\Crop(new Manipulator\Box(), new Manipulator\Point());
+        $this->resize = new Manipulator\Resize(new Manipulator\Box(), new Manipulator\Point());
     }
 
     /**
@@ -44,8 +44,8 @@ class CropTest extends \PHPUnit_Framework_TestCase
      */
     public function testManipulateWithCorrectValues()
     {
-        $image = $this->crop->manipulate($this->image->open($this->path), 200, 200);
-        static::assertEquals(200, $image->getSize()->getWidth());
+        $image = $this->resize->manipulate($this->image->open($this->path), 200, 200);
+        static::assertEquals(267, $image->getSize()->getWidth());
         static::assertEquals(200, $image->getSize()->getHeight());
     }
 
@@ -54,8 +54,8 @@ class CropTest extends \PHPUnit_Framework_TestCase
      */
     public function testManipulateWithFloat()
     {
-        $image = $this->crop->manipulate($this->image->open($this->path), 200.10, 200.10);
-        static::assertEquals(200, $image->getSize()->getWidth());
+        $image = $this->resize->manipulate($this->image->open($this->path), 200.10, 200.10);
+        static::assertEquals(267, $image->getSize()->getWidth());
         static::assertEquals(200, $image->getSize()->getHeight());
     }
 
@@ -64,8 +64,8 @@ class CropTest extends \PHPUnit_Framework_TestCase
      */
     public function testsManipulateWithNumericString()
     {
-        $image = $this->crop->manipulate($this->image->open($this->path), '200', '200');
-        static::assertEquals(200, $image->getSize()->getWidth());
+        $image = $this->resize->manipulate($this->image->open($this->path), '200', '200');
+        static::assertEquals(267, $image->getSize()->getWidth());
         static::assertEquals(200, $image->getSize()->getHeight());
     }
 
@@ -75,6 +75,7 @@ class CropTest extends \PHPUnit_Framework_TestCase
     public function testManipulateWithNonNumericString()
     {
         static::setExpectedExceptionRegExp('LogicException');
-        $this->crop->manipulate($this->image->open($this->path), 'test', 'test');
+        $this->resize->manipulate($this->image->open($this->path), 'test', 'test');
     }
+
 }

@@ -5,7 +5,7 @@ namespace Todstoychev\Icr\Manipulator;
 use Imagine\Image\AbstractImage;
 
 /**
- * Performs resize operation
+ * Performs resize operation. Resize image while keeps the ratio.
  *
  * @package Todstoychev\Icr\Manipulator
  * @author Todor Todorov <todstoychev@gmail.com>
@@ -19,8 +19,8 @@ class Resize extends AbstractManipulator
      */
     public function manipulate(AbstractImage $image, $width, $height)
     {
-        $this->calculateResize($image, $width, $height);
+        $box = $this->calculateResize($image, $width, $height);
 
-        return $image->resize($this->box);
+        return $image->resize($box);
     }
 }

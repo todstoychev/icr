@@ -95,11 +95,15 @@ abstract class AbstractManipulator
      */
     protected function calculateResize(AbstractImage $abstractImage, $width, $height)
     {
+        if (!is_numeric($width) || !is_numeric($height)) {
+            throw new \LogicException('Non numeric value provide for calculating resize!');
+        }
+
         $imageWidth = $abstractImage->getSize()->getWidth();
         $imageHeight = $abstractImage->getSize()->getHeight();
 
-        $widthRatio = $imageWidth / $width;
-        $heightRatio = $imageHeight / $height;
+        $widthRatio = $imageWidth / (int) $width;
+        $heightRatio = $imageHeight / (int) $height;
         $ratio = min($widthRatio, $heightRatio);
 
         if ($ratio < 1) {
