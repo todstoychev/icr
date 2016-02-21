@@ -128,7 +128,7 @@ class Processor
      * @param string $context Context name
      * @param FilesystemAdapter $filesystemAdapter
      *
-     * @return Processor
+     * @return Processor$context
      */
     protected function deleteSizes($fileName, $context, FilesystemAdapter $filesystemAdapter)
     {

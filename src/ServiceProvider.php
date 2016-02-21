@@ -39,18 +39,18 @@ class ServiceProvider extends BaseProvider
         );
 
         $this->app->bind(
-            'manipulator_factory',
+            'manipulator.factory',
             function () {
                 return new ManipulatorFactory(new Box(), new Point());
             }
         );
 
         $this->app->bind(
-            'icr_processor',
+            'icr.processor',
             function () {
                 return new Processor(
                     Config::get('icr'),
-                    $this->app->make('manipulator_factory'),
+                    $this->app->make('manipulator.factory'),
                     new OpenImageHandler(),
                     new FileManager()
                 );

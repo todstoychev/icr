@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">5.5.9",
+        "php": ">=5.5.9",
         "imagine/imagine": "0.6.*",
         "illuminate/support": ">5.0"
     },
