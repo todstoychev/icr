@@ -48,7 +48,7 @@ class ManipulatorFactory
 
         $operation = str_replace('-', ' ', $operation);
         $operation = strtolower($operation);
-        $operation = ucfirst($operation);
+        $operation = ucwords($operation);
         $operation = str_replace(' ', '', $operation);
 
         $className = "Todstoychev\\Icr\\Manipulator\\" . $operation;
