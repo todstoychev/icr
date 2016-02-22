@@ -18,7 +18,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $rootPath = __DIR__ . '/../fixtures/';
+    protected $rootPath;
 
     /**
      * @var FilesystemAdapter
@@ -40,6 +40,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        $this->rootPath = __DIR__ . '/../fixtures/';
         $this->filesystemAdapter = new FilesystemAdapter(new Filesystem(new Local($this->rootPath)));
         $this->fileManager = new FileManager();
         $this->file = file_get_contents($this->rootPath . '/test_image.png');
