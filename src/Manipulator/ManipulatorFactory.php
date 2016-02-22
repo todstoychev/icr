@@ -46,7 +46,12 @@ class ManipulatorFactory
             throw new \LogicException("Provided manipulation name {$operation} is not a string!");
         }
 
-        $className = "Todstoychev\\Icr\\Manipulator\\" . ucfirst(strtolower($operation));
+        $operation = str_replace('-', '', $operation);
+        $operation = strtolower($operation);
+        $operation = ucfirst($operation);
+        $operation = str_replace(' ', '', $operation);
+
+        $className = "Todstoychev\\Icr\\Manipulator\\" . $operation;
 
         if (!class_exists($className)) {
             throw new IcrRuntimeException("Operation {$operation} dies not exists!");
