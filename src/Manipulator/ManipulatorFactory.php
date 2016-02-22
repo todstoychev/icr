@@ -54,7 +54,7 @@ class ManipulatorFactory
         $className = "Todstoychev\\Icr\\Manipulator\\" . $operation;
 
         if (!class_exists($className)) {
-            throw new IcrRuntimeException("Operation {$operation} dies not exists!");
+            throw new IcrRuntimeException("Operation {$operation} does not exists!");
         }
 
         return new $className($this->box, $this->point);
