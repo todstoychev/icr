@@ -27,21 +27,94 @@ class BoxTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests constructor with non numeric string
+     */
+    public function testConstructWithNonNumericString()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        new Box('test', 'test');
+    }
+
+    /**
+     * Test construct with negative values
+     */
+    public function testConstructWithNegativeValues()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        new Box(-10, -10);
+    }
+
+    /**
      * Tests width setter and getter
      */
-    public function testWidth()
+    public function testWidthWithInteger()
     {
         $this->box->setWidth(200);
         static::assertEquals(200, $this->box->getWidth());
     }
 
+
+    /**
+     * Tests width setter and getter
+     */
+    public function testWidthWithFloat()
+    {
+        $this->box->setWidth(200.10);
+        static::assertEquals(200, $this->box->getWidth());
+    }
+
+    /**
+     * Tests width setter and getter
+     */
+    public function testWidthWithNumericString()
+    {
+        $this->box->setWidth('200');
+        static::assertEquals(200, $this->box->getWidth());
+    }
+
+    /**
+     * Tests width setter and getter
+     */
+    public function testWidthWithNonNumericString()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        $this->box->setWidth('test');
+    }
+
     /**
      * Tests height setter and getter
      */
-    public function testHeight()
+    public function testHeightWithInteger()
     {
         $this->box->setHeight(300);
         static::assertEquals(300, $this->box->getHeight());
+    }
+
+    /**
+     * Tests height setter and getter
+     */
+    public function testHeightWithFloat()
+    {
+        $this->box->setHeight(300.10);
+        static::assertEquals(300, $this->box->getHeight());
+    }
+
+    /**
+     * Tests height setter and getter
+     */
+    public function testHeightWithNumericString()
+    {
+        $this->box->setHeight('300');
+        static::assertEquals(300, $this->box->getHeight());
+    }
+
+    /**
+     * Tests height setter and getter
+     */
+    public function testHeightWithNonNumericString()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        $this->box->setHeight('test');
     }
 
     /**
@@ -84,6 +157,15 @@ class BoxTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test scale with non numeric value
+     */
+    public function testScaleWithNegative()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        $this->box->scale(-200);
+    }
+
+    /**
      * Test increase with integer
      */
     public function testIncreaseWithInteger()
@@ -120,6 +202,15 @@ class BoxTest extends \PHPUnit_Framework_TestCase
     {
         static::setExpectedExceptionRegExp('LogicException');
         $this->box->increase('test');
+    }
+
+    /**
+     * Tests increase with non numeric string
+     */
+    public function testsIncreaseWithNegative()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        $this->box->increase(-500);
     }
 
     /**
@@ -202,6 +293,15 @@ class BoxTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests widen with negative argument
+     */
+    public function testWidenWithString()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        $this->box->widen('test');
+    }
+
+    /**
      * Tests heighten
      */
     public function testHeighten()
@@ -248,5 +348,14 @@ class BoxTest extends \PHPUnit_Framework_TestCase
     {
         static::setExpectedExceptionRegExp('LogicException');
         $this->box->heighten(-10);
+    }
+
+    /**
+     * Tests heighten with negative argument
+     */
+    public function testHeightenWithString()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        $this->box->heighten('test');
     }
 }

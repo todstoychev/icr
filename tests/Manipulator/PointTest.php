@@ -116,6 +116,16 @@ class PointTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests move with negative values
+     */
+    public function testMoveWithNegativeValues()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        $this->point->setBox($this->box)
+            ->move(-100);
+    }
+
+    /**
      * Test to string
      */
     public function testToString()

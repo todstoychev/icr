@@ -34,46 +34,6 @@ abstract class AbstractManipulator
     }
 
     /**
-     * @return Box
-     */
-    public function getBox()
-    {
-        return $this->box;
-    }
-
-    /**
-     * @param Box $box
-     *
-     * @return AbstractManipulator
-     */
-    public function setBox(Box $box)
-    {
-        $this->box = $box;
-
-        return $this;
-    }
-
-    /**
-     * @return Point
-     */
-    public function getPoint()
-    {
-        return $this->point;
-    }
-
-    /**
-     * @param Point $point
-     *
-     * @return AbstractManipulator
-     */
-    public function setPoint(Point $point)
-    {
-        $this->point = $point;
-
-        return $this;
-    }
-
-    /**
      * Main manipulate method
      *
      * @param AbstractImage $abstractImage
@@ -132,10 +92,22 @@ abstract class AbstractManipulator
      */
     protected function createCropPoint(AbstractImage $abstractImage, $width, $height)
     {
+        if (!is_numeric($width) || !is_numeric($height)) {
+            throw new \LogicException('Provided values for width and height are not numeric!');
+        }
+
+        $width = (int) $width;
+        $height = (int) $height;
+
         $imageWidth = $abstractImage->getSize()
             ->getWidth();
         $imageHeight = $abstractImage->getSize()
             ->getHeight();
+
+        if ($imageWidth < $width || $imageHeight < $height) {
+            throw new ImageTooSmallException('Provided image is too small to be resize! Provide larger image.');
+        }
+
         $cropWidth = ($imageWidth / 2) - ($width / 2);
         $cropHeight = ($imageHeight / 2) - ($height / 2);
 

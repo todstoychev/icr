@@ -78,4 +78,13 @@ class ResizeTest extends \PHPUnit_Framework_TestCase
         $this->resize->manipulate($this->image->open($this->path), 'test', 'test');
     }
 
+    /**
+     * Test manipulate with large input
+     */
+    public function testManipulateWithLargeInput()
+    {
+        static::setExpectedExceptionRegExp('LogicException');
+        $this->resize->manipulate($this->image->open($this->path), 2000, 2000);
+    }
+
 }

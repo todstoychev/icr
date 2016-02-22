@@ -77,4 +77,13 @@ class CropTest extends \PHPUnit_Framework_TestCase
         static::setExpectedExceptionRegExp('LogicException');
         $this->crop->manipulate($this->image->open($this->path), 'test', 'test');
     }
+
+    /**
+     * Test manipulate with large values
+     */
+    public function testManipulateWithTooLargeParameters()
+    {
+        static::setExpectedExceptionRegExp('Todstoychev\Icr\Exception\ImageTooSmallException');
+        $this->crop->manipulate($this->image->open($this->path), 2000, 2000);
+    }
 }

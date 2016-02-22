@@ -77,4 +77,14 @@ class ScaleTest extends \PHPUnit_Framework_TestCase
         static::setExpectedExceptionRegExp('LogicException');
         $this->scale->manipulate($this->image->open($this->path), 'test', 'test');
     }
+
+    /**
+     * Test manipulate with large values
+     */
+    public function testManipulateWithLargeValues()
+    {
+        $image = $this->scale->manipulate($this->image->open($this->path), 2000, 2000);
+        static::assertEquals(2000, $image->getSize()->getWidth());
+        static::assertEquals(2000, $image->getSize()->getHeight());
+    }
 }

@@ -37,7 +37,7 @@ class Box implements BoxInterface
         }
 
         if ($width < 0 || $height < 0) {
-            throw new \LogicException('Scale ratio is negative!');
+            throw new \LogicException('Provided values should not be negative!');
         }
 
         $this->width  = (int) $width;
@@ -63,7 +63,7 @@ class Box implements BoxInterface
             throw new \LogicException('Box width is NaN!');
         }
 
-        $this->width = $width;
+        $this->width = (int) $width;
 
         return $this;
     }
@@ -87,7 +87,7 @@ class Box implements BoxInterface
             throw new \LogicException('Box height is NaN!');
         }
 
-        $this->height = $height;
+        $this->height = (int) $height;
 
         return $this;
     }
@@ -122,12 +122,8 @@ class Box implements BoxInterface
         $width = (int) $size + $this->width;
         $height = (int) $size + $this->height;
 
-        if ($width < 0) {
-            throw new \LogicException('Provided increase size produces negative width!');
-        }
-
-        if ($height < 0) {
-            throw new \LogicException('Provided increase size produces negative width!');
+        if ($width < 0 || $height < 0) {
+            throw new \LogicException('Provided increase size produces negative values!');
         }
 
         return new Box((int) $size + $this->width, (int) $size + $this->height);

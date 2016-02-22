@@ -54,9 +54,9 @@ class ResizeCropTest extends \PHPUnit_Framework_TestCase
      */
     public function testManipulateWithFloat()
     {
-        $image = $this->resizeCrop->manipulate($this->image->open($this->path), 200.10, 200.10);
-        static::assertEquals(200, $image->getSize()->getWidth());
-        static::assertEquals(200, $image->getSize()->getHeight());
+        $image = $this->resizeCrop->manipulate($this->image->open($this->path), 100.10, 100.10);
+        static::assertEquals(100, $image->getSize()->getWidth());
+        static::assertEquals(100, $image->getSize()->getHeight());
     }
 
     /**
