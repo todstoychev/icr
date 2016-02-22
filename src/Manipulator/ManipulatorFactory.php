@@ -46,7 +46,7 @@ class ManipulatorFactory
             throw new \LogicException("Provided manipulation name {$operation} is not a string!");
         }
 
-        $operation = str_replace('-', '', $operation);
+        $operation = str_replace('-', ' ', $operation);
         $operation = strtolower($operation);
         $operation = ucfirst($operation);
         $operation = str_replace(' ', '', $operation);
