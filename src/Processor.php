@@ -48,7 +48,7 @@ class Processor
         OpenImageHandler $openImageHandler,
         FileManager $fileManager
     ) {
-        $this->config = $config::get('icr');
+        $this->config = $config;
         $this->manipulatorFactory = $manipulatorFactory;
         $this->openImageHandler = $openImageHandler;
         $this->openImageHandler->setImageLibrary($this->config['image_adapter']);
