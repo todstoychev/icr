@@ -2,94 +2,164 @@
 
 namespace Todstoychev\Icr\Handler;
 
-use Todstoychev\Icr\Exception\ExtensionNotFoundException;
+use Imagine\Gd\Imagine as GdImage;
+use Imagine\Gmagick\Imagine as GmagickImage;
+use Imagine\Image\AbstractImage;
+use Imagine\Imagick\Imagine as ImagickImage;
+use Todstoychev\Icr\Exception\IcrRuntimeException;
 
 /**
- * Handles existing image openning and creates the necessary image object, depending on the driver set
- * in the configuration.
+ * Opens image with Imagine
  *
- * @author Todor Todorov <todstoychev@gmail.com>
  * @package Todstoychev\Icr\Handler
+ * @author Todor Todorov <todstoychev@gmail.com>
  */
-class OpenImageHandler extends AbstractHandler
+class OpenImageHandler
 {
     /**
-     * Open image
-     *
-     * @param string $context
-     * @param string $fileName
-     *
-     * @return ImageInterface
+     * @var string
      */
-    public function openImage($context, $fileName)
-    {
-        $imageDriver = $this->config['driver'];
-        $imageDriver = ucfirst($imageDriver);
-        $path = public_path($this->getUploadsPath() . '/' . $context . '/' . $fileName);
-        $functionName = 'openWith' . $imageDriver;
+    protected $imageLibrary;
 
-        return call_user_func([$this, $functionName], $path);
+    /**
+     * @var string
+     */
+    protected $image;
+
+    /**
+     * @var string
+     */
+    protected $path;
+
+    /**
+     * @param string $imageLibrary Image library name
+     */
+    public function __construct($imageLibrary = 'gd')
+    {
+        $this->imageLibrary = $imageLibrary;
     }
 
     /**
-     * Open image with GD implementation
+     * @param string $imageLibrary
      *
-     * @param string $path
-     *
-     * @return \Imagine\Gd\Image
-     * @throws ExtensionNotFoundException
+     * @return OpenImageHandler
      */
-    protected function openWithGd($path)
+    public function setImageLibrary($imageLibrary)
     {
-        $matches = [];
+        $this->imageLibrary = $imageLibrary;
 
-        preg_match('/\.[a-z]{3,4}$/', $path, $matches);
+        return $this;
+    }
 
-        $extension = array_shift($matches);
+    /**
+     * Loads image from data string with imagine based on the driver name
+     *
+     * @param string $image Image as string
+     *
+     * @return AbstractImage
+     */
+    public function loadImage($image)
+    {
+        $imageLibrary = ucfirst($this->imageLibrary);
+        $functionName = 'loadWith' . $imageLibrary;
+        $this->image = $image;
 
-        if (empty($extension)) {
-            throw new ExtensionNotFoundException(trans('icr::exceptions.extension_not_found'));
+        if (!method_exists($this, $functionName)) {
+            throw new IcrRuntimeException('Wrong image library name provided!');
         }
 
-        $extension = str_replace('.', '', $extension);
+        return call_user_func([$this, $functionName]);
+    }
 
-        if ($extension == 'jpg') {
-            $extension = 'jpeg';
+    /**
+     * Open image from path with imagine library
+     *
+     * @param string $path
+     *
+     * @return AbstractImage
+     */
+    public function openImage($path)
+    {
+        $imageLibrary = ucfirst($this->imageLibrary);
+        $functionName = 'openWith' . $imageLibrary;
+        $this->path = $path;
+
+        if (!method_exists($this, $functionName)) {
+            throw new IcrRuntimeException('Wrong image library name provided!');
         }
 
-        // Create function name to open the image as GD resource
-        $functionName = 'imagecreatefrom' . $extension;
-
-        $resource = call_user_func($functionName, $path);
-
-        return new \Imagine\Gd\Image($resource);
+        return call_user_func([$this, $functionName]);
     }
 
     /**
-     * Open image with Imagick
+     * Opens image with Imagine Gd
      *
-     * @param string $path
-     *
-     * @return \Imagine\Imagick\Image
+     * @return AbstractImage
      */
-    protected function openWithImagick($path)
+    protected function loadWithGd()
     {
-        $imagick = new \Imagick($path);
+        $imagine = new GdImage();
 
-        return new \Imagine\Imagick\Image($imagick);
+        return $imagine->load($this->image);
     }
 
     /**
-     * Open image with Gmagick
+     * Opens image with Imagine Imagick
      *
-     * @param string $path
-     *
-     * @return \Imagine\Gmagick\Image
+     * @return AbstractImage
      */
-    protected function openWithGmagick($path)
+    protected function loadWithImagick()
     {
-        $gmagick = new \Gmagick($path);
+        $imagine = new ImagickImage();
 
-        return new \Imagine\Gmagick\Image($gmagick);
+        return $imagine->load($this->image);
+    }
+
+    /**
+     * Opens image with Imagine Gmagick
+     *
+     * @return AbstractImage
+     */
+    protected function loadWithGmagick()
+    {
+        $imagine = new GmagickImage();
+
+        return $imagine->load($this->image);
+    }
+
+    /**
+     * Opens image with GD
+     *
+     * @return AbstractImage
+     */
+    protected function openWithGd()
+    {
+        $imagine = new GdImage();
+
+        return $imagine->open($this->path);
+    }
+
+    /**
+     * Opens image with Imagick
+     *
+     * @return AbstractImage
+     */
+    protected function openWithImagick()
+    {
+        $imagine = new ImagickImage();
+
+        return $imagine->open($this->path);
+    }
+
+    /**
+     * Opens image with Gmagick
+     *
+     * @return AbstractImage
+     */
+    protected function openWithGmagick()
+    {
+        $imagine = new GmagickImage();
+
+        return $imagine->open($this->path);
     }
 }

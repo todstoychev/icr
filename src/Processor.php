@@ -2,335 +2,184 @@
 
 namespace Todstoychev\Icr;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Todstoychev\Icr;
-use Todstoychev\Icr\Handler;
-use Todstoychev\Icr\Reader\DirectoryTreeReader;
+use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Facades\Config;
+use Todstoychev\Icr\Handler\OpenImageHandler;
+use Todstoychev\Icr\Manager\FileManager;
+use Todstoychev\Icr\Manipulator\ManipulatorFactory;
 
 /**
- * Used to perform main operations
+ * Processes images.
  *
- * @author Todor Todorov <todstoychev@gmail.com>
  * @package Todstoychev\Icr
+ * @author Todor Todorov <todstoychev@gmail.com>
  */
 class Processor
 {
     /**
-     * @var Handler\ConfigurationValidationHandler
+     * @var array
      */
-    protected $configurationValidationHandler;
+    protected $config;
 
     /**
-     * @var Handler\DirectoryHandler
+     * @var ManipulatorFactory
      */
-    protected $directoryHandler;
+    protected $manipulatorFactory;
 
     /**
-     * @var Handler\UploadedFileHandler
-     */
-    protected $uploadedFileHandler;
-
-    /**
-     * @var Handler\OpenImageHandler
+     * @var OpenImageHandler
      */
     protected $openImageHandler;
 
     /**
-     * @var Handler\DeleteImageHandler
+     * @var FileManager
      */
-    protected $deleteImageHandler;
+    protected $fileManager;
 
     /**
-     * @var DirectoryTreeReader
-     */
-    protected $directoryTreeReader;
-
-    /**
-     * @param Handler\ConfigurationValidationHandler $configurationValidationHandler
-     * @param Handler\DirectoryHandler $directoryHandler
-     * @param Handler\UploadedFileHandler $uploadedFileHandler
-     * @param Handler\OpenImageHandler $openImageHandler
-     * @param Handler\DeleteImageHandler $deleteImageHandler
-     * @param DirectoryTreeReader $directoryTreeReader
+     * @param Config $config
+     * @param ManipulatorFactory $manipulatorFactory
+     * @param OpenImageHandler $openImageHandler
+     * @param FileManager $fileManager
      */
     public function __construct(
-        Handler\ConfigurationValidationHandler $configurationValidationHandler,
-        Handler\DirectoryHandler $directoryHandler,
-        Handler\UploadedFileHandler $uploadedFileHandler,
-        Handler\OpenImageHandler $openImageHandler,
-        Handler\DeleteImageHandler $deleteImageHandler,
-        DirectoryTreeReader $directoryTreeReader
+        Config $config,
+        ManipulatorFactory $manipulatorFactory,
+        OpenImageHandler $openImageHandler,
+        FileManager $fileManager
     ) {
-        $this->setConfigurationValidationHandler($configurationValidationHandler);
-        $this->setDirectoryHandler($directoryHandler);
-        $this->setUploadedFileHandler($uploadedFileHandler);
-        $this->setOpenImageHandler($openImageHandler);
-        $this->setDeleteImageHandler($deleteImageHandler);
-        $this->setDirectoryTreeReader($directoryTreeReader);
-    }
-
-    /**
-     * @return Handler\ConfigurationValidationHandler
-     */
-    public function getConfigurationValidationHandler()
-    {
-        return $this->configurationValidationHandler;
-    }
-
-    /**
-     * @param Handler\ConfigurationValidationHandler $configurationValidationHandler
-     *
-     * @return Processor
-     */
-    public function setConfigurationValidationHandler(
-        Handler\ConfigurationValidationHandler $configurationValidationHandler
-    ) {
-        $this->configurationValidationHandler = $configurationValidationHandler;
-
-        return $this;
-    }
-
-    /**
-     * @return Handler\DirectoryHandler
-     */
-    public function getDirectoryHandler()
-    {
-        return $this->directoryHandler;
-    }
-
-    /**
-     * @param Handler\DirectoryHandler $directoryHandler
-     *
-     * @return Processor
-     */
-    public function setDirectoryHandler(Handler\DirectoryHandler $directoryHandler)
-    {
-        $this->directoryHandler = $directoryHandler;
-
-        return $this;
-    }
-
-    /**
-     * @return Handler\UploadedFileHandler
-     */
-    public function getUploadedFileHandler()
-    {
-        return $this->uploadedFileHandler;
-    }
-
-    /**
-     * @param Handler\UploadedFileHandler $uploadedFileHandler
-     *
-     * @return Processor
-     */
-    public function setUploadedFileHandler(Handler\UploadedFileHandler $uploadedFileHandler)
-    {
-        $this->uploadedFileHandler = $uploadedFileHandler;
-
-        return $this;
-    }
-
-    /**
-     * @return Handler\OpenImageHandler
-     */
-    public function getOpenImageHandler()
-    {
-        return $this->openImageHandler;
-    }
-
-    /**
-     * @param Handler\OpenImageHandler $openImageHandler
-     * @return Processor
-     */
-    public function setOpenImageHandler(Handler\OpenImageHandler $openImageHandler)
-    {
+        $this->config = $config::get('icr');
+        $this->manipulatorFactory = $manipulatorFactory;
         $this->openImageHandler = $openImageHandler;
-
-        return $this;
+        $this->openImageHandler->setImageLibrary($this->config['image_adapter']);
+        $this->fileManager = $fileManager;
     }
 
     /**
-     * @return Handler\DeleteImageHandler
-     */
-    public function getDeleteImageHandler()
-    {
-        return $this->deleteImageHandler;
-    }
-
-    /**
-     * @param Handler\DeleteImageHandler $deleteImageHandler
-     *
-     * @return Processor
-     */
-    public function setDeleteImageHandler(Handler\DeleteImageHandler $deleteImageHandler)
-    {
-        $this->deleteImageHandler = $deleteImageHandler;
-
-        return $this;
-    }
-
-    /**
-     * @return DirectoryTreeReader
-     */
-    public function getDirectoryTreeReader()
-    {
-        return $this->directoryTreeReader;
-    }
-
-    /**
-     * @param DirectoryTreeReader $directoryTreeReader
-     *
-     * @return Processor
-     */
-    public function setDirectoryTreeReader(DirectoryTreeReader $directoryTreeReader)
-    {
-        $this->directoryTreeReader = $directoryTreeReader;
-
-        return $this;
-    }
-
-    /**
-     * Handles image upload operation
-     *
-     * @param UploadedFile $uploadedFile
-     * @param string $context
-     * @return \Exception|string
-     */
-    public function upload(UploadedFile $uploadedFile, $context)
-    {
-        try {
-            $fileName = $this->uploadImage($uploadedFile, $context);
-
-            return $this->processImage($context, $fileName);
-        } catch (\Exception $e) {
-            $this->getDeleteImageHandler()->deleteImage($context, $fileName);
-
-            return $e;
-        }
-    }
-
-    /**
-     * Handles image delete operation
-     *
-     * @param string $fileName
-     * @param string $context
-     * @throws Exception\NonExistingContextException
-     */
-    public function delete($fileName, $context)
-    {
-        $this->getConfigurationValidationHandler()->validateContext($context);
-        $this->getDeleteImageHandler()->deleteImage($context, $fileName);
-    }
-
-    /**
-     * Handles image rebuilding for particular context
+     * Handles image upload
      *
      * @param string $context
-     *
-     * @return bool
-     * @throws Exception\NonExistingArrayKeyException
-     */
-    public function rebuild($context)
-    {
-        $this->getDirectoryHandler()->deleteContextFilesAndDirectories($context)->checkAndCreateDirectories($context);
-
-        $path = public_path($this->getDirectoryHandler()->getUploadsPath() . '/' . $context);
-
-        $this->getDirectoryTreeReader()->setPath($path)->read();
-
-        $fileNames = $this->getDirectoryTreeReader()->getFileNames();
-
-        foreach ($fileNames as $fileName) {
-            $this->processImage($context, $fileName);
-        }
-
-        return true;
-    }
-
-    /**
-     * Handles original image uploading process
-     *
-     * @param UploadedFile $uploadedFile
-     * @param string $context
+     * @param string $file
+     * @param string $extension
+     * @param FilesystemAdapter $filesystemAdapter
      *
      * @return string
-     * @throws Exception\InvalidConfigurationValueException
-     * @throws Exception\NonExistingContextException
      */
-    protected function uploadImage(UploadedFile $uploadedFile, $context)
+    public function upload($context, $file, $extension, FilesystemAdapter $filesystemAdapter)
     {
-        // Validate configuration data
-        $this->getConfigurationValidationHandler()
-            ->validateConfigValues($context)
-            ->validateContext($context)
-            ->validateDriver();
+        // Upload original image
+        $fileName = $this->fileManager->setFileSystemAdapter($filesystemAdapter)
+            ->uploadFile($file, $extension, $context);
 
-        // Check the directories structure
-        $this->getDirectoryHandler()->checkAndCreateDirectories($context);
-
-        // Generate name and save the original image file
-        $this->getUploadedFileHandler()->handle($uploadedFile, $context);
-
-        $fileName = $this->getUploadedFileHandler()->getFileName();
+        $this->processSizes($file, $fileName, $context, $extension, $filesystemAdapter);
 
         return $fileName;
     }
 
     /**
-     * Processes single image
+     * Delete file
      *
+     * @param string $fileName File to delete
+     * @param string $context Context name
+     * @param FilesystemAdapter $filesystemAdapter
+     *
+     * @return bool
+     */
+    public function delete($fileName, $context, FilesystemAdapter $filesystemAdapter)
+    {
+        // Delete sizes
+        $this->deleteSizes($fileName, $context, $filesystemAdapter);
+
+        // Delete original file
+        $filesystemAdapter->delete('/' . $context . '/' . $fileName);
+
+        return true;
+    }
+
+    /**
+     * Rebuilds image sizes
+     *
+     * @param string $fileName
      * @param string $context
+     * @param FilesystemAdapter $filesystemAdapter
+     *
+     * @return bool
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function rebuild($fileName, $context, FilesystemAdapter $filesystemAdapter)
+    {
+        // Open original file
+        $originalImage = $filesystemAdapter->get('/' . $context . '/' . $fileName);
+        $originalImage = $this->openImageHandler->loadImage($originalImage);
+        $extension = $this->findExtension($fileName);
+
+        // Rebuild sizes
+        $this->deleteSizes($fileName, $context, $filesystemAdapter);
+        $this->fileManager->setFileSystemAdapter($filesystemAdapter);
+        $this->processSizes($originalImage, $fileName, $context, $extension, $filesystemAdapter);
+
+        return true;
+    }
+
+    /**
+     * Deletes sizes
+     *
+     * @param string $fileName File name
+     * @param string $context Context name
+     * @param FilesystemAdapter $filesystemAdapter
+     *
+     * @return Processor$context
+     */
+    protected function deleteSizes($fileName, $context, FilesystemAdapter $filesystemAdapter)
+    {
+        $this->fileManager->setFileSystemAdapter($filesystemAdapter);
+
+        foreach ($this->config[$context] as $sizeName => $values) {
+            $path = $this->fileManager->path($context, $sizeName);
+            $filesystemAdapter->delete($path . $fileName);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Find file extension
+     *
      * @param string $fileName
      *
      * @return string
      */
-    protected function processImage($context, $fileName)
+    protected function findExtension($fileName)
     {
-        $config = $this->getOpenImageHandler()->getConfig();
+        preg_match('/.[a-Z]{3,4}$/', $fileName, $matches);
 
-        $image = $this->getOpenImageHandler()->openImage($context, $fileName);
-
-        foreach ($config[$context] as $sizeName => $values) {
-            $imageCopy = $image->copy();
-
-            // Form operation name name
-            $operationClassName = $this->createOperationClassName($values['operation']);
-
-            $operationClassName = '\Todstoychev\Icr\Operation\\' . $operationClassName;
-
-            // Create class instance
-            $operation = new $operationClassName($imageCopy, $values['width'], $values['height']);
-
-            // Perform operation and save the image
-            $operation->doAction();
-            $path = public_path($config['uploads_path'] . '/' . $context . '/' . $sizeName . '/' . $fileName);
-            $path = preg_replace('/\.[a-z]{3,4}$/', $config['output_format'][$context], $path);
-            $imageCopy->save($path);
-
-            // Delete existing instance
-            unset($imageCopy);
-        }
-
-        return preg_replace('/\.[a-z]{3,4}$/', $config['output_format'][$context], $fileName);
+        return array_shift($matches);
     }
 
     /**
-     * Creates operation class name. Used to determine dynamic the operation class name.
+     * Process sizes
      *
-     * @param string $operation
+     * @param string $file File data
+     * @param string $fileName File name
+     * @param string $context File context
+     * @param string $extension File extension
+     * @param FilesystemAdapter $filesystemAdapter
      *
-     * @return string
+     * @return Processor
      */
-    protected function createOperationClassName($operation)
+    public function processSizes($file, $fileName, $context, $extension, FilesystemAdapter $filesystemAdapter)
     {
-        $array = explode('-', $operation);
+        foreach ($this->config[$context] as $sizeName => $values) {
+            $image = $this->openImageHandler->loadImage($file);
+            $operation = $this->manipulatorFactory->create(
+                $values['operation']
+            );
+            $image = $operation->manipulate($image, $values['width'], $values['height']);
 
-        foreach ($array as $key => $value) {
-            $array[$key] = ucfirst($value);
+            $this->fileManager->setFileSystemAdapter($filesystemAdapter)
+                ->uploadFile($image, $extension, $context, $sizeName, $fileName);
         }
 
-        $state = implode('', $array);
-
-        return $state . 'Operation';
+        return $this;
     }
 }

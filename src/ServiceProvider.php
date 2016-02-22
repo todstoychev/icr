@@ -2,111 +2,59 @@
 
 namespace Todstoychev\Icr;
 
-use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Todstoychev\Icr\Console\RebuildCommand;
-use Todstoychev\Icr\Handler;
-use Todstoychev\Icr\Reader\DirectoryTreeReader;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\ServiceProvider as BaseProvider;
+use Todstoychev\Icr\Handler\OpenImageHandler;
+use Todstoychev\Icr\Manager\FileManager;
+use Todstoychev\Icr\Manipulator\Box;
+use Todstoychev\Icr\Manipulator\ManipulatorFactory;
+use Todstoychev\Icr\Manipulator\Point;
 
-/**
- * Service provider class
- *
- * @author Todor Todorov <todstoychev@gmail.com>
- * @package Todstoychev\Icr
- */
-class ServiceProvider extends BaseServiceProvider
+class ServiceProvider extends BaseProvider
 {
     /**
      * Bootstrap the application services.
+     *
+     * @return void
      */
     public function boot()
     {
-        $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'icr');
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'icr');
-
-        $this->publishes([
-            __DIR__ . '/config/config.php' => config_path('icr/config.php'),
-            __DIR__ . '/../resources/lang' => base_path('resources/lang/todstoychev/icr')
-        ]);
+        $this->publishes(
+            [
+                __DIR__ . '/../config/' => config_path('icr/'),
+            ]
+        );
     }
 
     /**
-     * @inheritdoc
+     * Register the application services.
+     *
+     * @return void
      */
     public function register()
     {
-        // Bind ICR configuration
-        $this->app->bind('icr.config', function () {
-            return 'icr.config';
-        });
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/config.php',
+            'icr'
+        );
 
-        // Configuration validator
-        $this->app->bind('icr.configuration_validation.handler', function () {
-            return new Handler\ConfigurationValidationHandler(
-                $this->app->make('icr.config')
-            );
-        });
+        $this->app->bind(
+            'manipulator.factory',
+            function () {
+                return new ManipulatorFactory(new Box(), new Point());
+            }
+        );
 
-        // Directory handler
-        $this->app->bind('icr.directory.handler', function () {
-            return new Handler\DirectoryHandler(
-                $this->app->make('icr.config')
-            );
-        });
-
-        // Original file handler
-        $this->app->bind('icr.uploaded_file.handler', function () {
-            return new Handler\UploadedFileHandler(
-                $this->app->make('icr.config')
-            );
-        });
-
-        // Open image handler
-        $this->app->bind('icr.open_image.handler', function () {
-            return new Handler\OpenImageHandler(
-                $this->app->make('icr.config')
-            );
-        });
-
-        // Delete image handler
-        $this->app->bind('icr.delete_image.handler', function () {
-            return new Handler\DeleteImageHandler(
-                $this->app->make('icr.config')
-            );
-        });
-
-        // Directory tree reader
-        $this->app->bind('icr.directory_tree.reader', function () {
-            return new DirectoryTreeReader();
-        });
-
-        // ICR main processor class
-        $this->app->bind('icr.processor', function () {
-            return new Processor(
-                $this->app->make('icr.configuration_validation.handler'),
-                $this->app->make('icr.directory.handler'),
-                $this->app->make('icr.uploaded_file.handler'),
-                $this->app->make('icr.open_image.handler'),
-                $this->app->make('icr.delete_image.handler'),
-                $this->app->make('icr.directory_tree.reader')
-            );
-        });
-
-        // Rebuild command
-        $this->app->bind('icr.rebuild.command', function () {
-            return new RebuildCommand(
-                $this->app->make('icr.processor')
-            );
-        });
-
-        // Commands
-        $this->commands(['icr.rebuild.command']);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function provides()
-    {
-        return ['icr.rebuild.command'];
+        $this->app->bind(
+            'icr.processor',
+            function () {
+                return new Processor(
+                    Config::get('icr'),
+                    $this->app->make('manipulator.factory'),
+                    new OpenImageHandler(),
+                    new FileManager()
+                );
+            }
+        );
     }
 }
