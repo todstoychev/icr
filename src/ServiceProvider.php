@@ -21,8 +21,9 @@ class ServiceProvider extends BaseProvider
     {
         $this->publishes(
             [
-                __DIR__ . '/../config/' => config_path('icr/'),
-            ]
+                __DIR__ . '/../config/config.php' => config_path('icr.php'),
+            ],
+            'icr'
         );
     }
 

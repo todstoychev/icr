@@ -37,18 +37,18 @@ class Processor
     protected $fileManager;
 
     /**
-     * @param Config $config
+     * @param array $config
      * @param ManipulatorFactory $manipulatorFactory
      * @param OpenImageHandler $openImageHandler
      * @param FileManager $fileManager
      */
     public function __construct(
-        Config $config,
+        array $config,
         ManipulatorFactory $manipulatorFactory,
         OpenImageHandler $openImageHandler,
         FileManager $fileManager
     ) {
-        $this->config = $config::get('icr');
+        $this->config = $config;
         $this->manipulatorFactory = $manipulatorFactory;
         $this->openImageHandler = $openImageHandler;
         $this->openImageHandler->setImageLibrary($this->config['image_adapter']);
