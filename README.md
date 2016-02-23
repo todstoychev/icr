@@ -3,7 +3,7 @@
 This is an image manipulation module based on the [Imagine](https://github.com/avalanche123/Imagine) module. It is for Laravel 5.* php framework.
 
 # Installation
-Use the standart composer way:
+Use the standard composer way:
 
 ```
 composer require todstoychev/icr
@@ -28,22 +28,24 @@ In the ```'providers'``` section of your Laravel ```config/app.php``` add: ```To
 
 In the ```'aliases'``` you can add: ```'Icr' => \Todstoychev\Icr\Icr::class,```
 
-Run ```php artisan vendor:publish --provider="Todstoychev\Icr\ServiceProvider"``` to publish the config.
+Run ```php artisan vendor:publish --provider="Todstoychev\Icr\ServiceProvider"``` to publish the config or you cal use also ```php artisan vendor:publish --tag=icr```.
+
+You will need also to set a new setting for the Storage module of Laravel. This can be done in the ```config/filesystem.php```.
+You can create something similar:
+```php
+'local' => [
+    'driver' => 'local',
+    'root'   => public_path('/uploads/images'),
+],
+```
+
+Put this one at the ```disks``` section of the file.
 
 ## The config file
-The file can be found in ```config/icr/``` it is called ```config.php```. The file contains several sections and parameters.
+The file can be found in ```config/``` it is called ```icr.php```. The file contains several sections and parameters.
 
-### uploads_path
-This parameter points to the directory where the images will be stored. The images are stored by default in the ```public/``` folder. This path points to location in the ```public``` folder.
-
-### driver
-This is setting for the driver library that will be used to process the images. ince Imagine has support for Gd, Imagick and Gmagick, the available values are gd, imagick or gmagick. 
-
-### allowed_filetypes
-This contains arrays with the allowed mimetypes/filetypes pairs. Those values can be defined per context.
-
-###  output_format
-This is setting to define the output format of the processed images. It is per context setting.
+### image_adapter
+This is setting for the driver library that will be used to process the images. Imagine has support for Gd, Imagick and Gmagick, the available values are gd, imagick or gmagick. 
 
 ### Contexts
 Those are the context settings. Each context is presented by array. The default one looks like this:
@@ -51,19 +53,19 @@ Those are the context settings. Each context is presented by array. The default 
 ```php
 'default' => [ 
         'small' => [
-            'width' => 32,
-            'height' => 32,
-            'operation' => 'resize-crop',
-        ],
-        'medium' => [
             'width' => 100,
             'height' => 100,
-            'operation' => 'resize-crop',
+            'operation' => 'resize',
+        ],
+        'medium' => [
+            'width' => 300,
+            'height' => 300,
+            'operation' => 'resize',
         ],
         'large' => [
-            'width' => 200,
-            'height' => 200,
-            'operation' => 'resize-crop',
+            'width' => 600,
+            'height' => 600,
+            'operation' => 'resize',
         ],
     ],
 ```
@@ -86,12 +88,13 @@ Allowed operations are crop, resize, scale, resize-crop.
 
 # Methods
 To use the module call its basic class - Icr. The class contain 2 methods. One to upload images, the other to delete.
+Another way to using it is to instantiate ```Todstoychev\Icr\Processor```
 
 ## Upload image
 The Icr::uploadImage() method returns the file name on success. if any errors it returns an exception class instance. You can use something similar in your controller method: 
 
 ```php
-$response = Icr::uploadImage($request->file('image'), 'my_context');
+$response = Icr::uploadImage($request->file('image'), 'my_context', 'images');
 
 if ($response instanceof \Exception) {
     // Handle the error
@@ -100,11 +103,13 @@ if ($response instanceof \Exception) {
 }
 ```
 
+As first argument you should use what is coming as file from the request, second argument is the context. The third argument is your setting name from the ```config/filesystem.php```. 
+
 ## Delete image
 This can be performed with Icr::deleteImage(). Example:
 
 ```php
-$response = Icr::deleteImage('my_file_name', 'my_context');
+$response = Icr::deleteImage('my_file_name', 'my_context', 'images');
 
 if ($response instanceof \Exception) {
     // Handle the error
@@ -112,3 +117,5 @@ if ($response instanceof \Exception) {
     // Delete the image name from database. Example: $myModel->deleteImage($response);
 }
 ```
+
+Parameters are the same as in the uploadImage() method, except the first one which is the file name of the file that should be deleted.

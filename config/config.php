@@ -2,7 +2,6 @@
 
 return [
     'image_adapter' => 'gd',
-    'uploads_path' => '/uploads/images',
 
     'default' => [
         'small' => [
