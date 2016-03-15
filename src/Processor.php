@@ -64,6 +64,7 @@ class Processor
      * @param FilesystemAdapter $filesystemAdapter
      *
      * @return string
+     * @throws \Exception
      */
     public function upload($context, $file, $extension, FilesystemAdapter $filesystemAdapter)
     {
@@ -71,7 +72,11 @@ class Processor
         $fileName = $this->fileManager->setFileSystemAdapter($filesystemAdapter)
             ->uploadFile($file, $extension, $context);
 
-        $this->processSizes($file, $fileName, $context, $extension, $filesystemAdapter);
+        try {
+            $this->processSizes($file, $fileName, $context, $extension, $filesystemAdapter);
+        } catch (\Exception $e) {
+            throw $e;
+        }
 
         return $fileName;
     }
