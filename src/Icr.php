@@ -23,14 +23,17 @@ class Icr
      *
      * @return \Exception|string
      */
-    public static function uploadImage(UploadedFile $uploadedFile, $context, $storage = 'local')
+    public static function uploadImage(UploadedFile $uploadedFile, $context, $storage = 'local', $fileName = null)
     {
         $file = File::get($uploadedFile);
-        return app('icr.processor')->upload(
+        /** @var Processor $processor */
+        $processor = app('icr.processor');
+        return $processor->upload(
             $context,
             $file,
             $uploadedFile->getClientOriginalExtension(),
-            Storage::disk($storage)
+            Storage::disk($storage),
+            $fileName
         );
     }
 
@@ -45,6 +48,9 @@ class Icr
      */
     public static function deleteImage($fileName, $context, $storage = 'local')
     {
-        return app('icr.processor')->delete($fileName, $context, Storage::disk($storage));
+        /** @var Processor $processor */
+        $processor = app('icr.processor');
+
+        return $processor->delete($fileName, $context, Storage::disk($storage));
     }
 }
