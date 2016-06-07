@@ -71,7 +71,7 @@ class Processor
     {
         // Upload original image
         $fileName = $this->fileManager->setFileSystemAdapter($filesystemAdapter)
-            ->uploadFile($file, $extension, $context, $fileName);
+            ->uploadFile($file, $extension, $context, null, $fileName);
 
         try {
             $this->processSizes($file, $fileName, $context, $extension, $filesystemAdapter);

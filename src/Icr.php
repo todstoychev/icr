@@ -20,8 +20,10 @@ class Icr
      * @param UploadedFile $uploadedFile
      * @param string $context
      * @param string $storage
+     * @param null|string $fileName
      *
      * @return \Exception|string
+     * @throws \Exception
      */
     public static function uploadImage(UploadedFile $uploadedFile, $context, $storage = 'local', $fileName = null)
     {
