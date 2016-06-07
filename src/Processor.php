@@ -62,16 +62,22 @@ class Processor
      * @param string $file
      * @param string $extension
      * @param FilesystemAdapter $filesystemAdapter
+     * @param string $fileName
      *
      * @return string
+     * @throws \Exception
      */
-    public function upload($context, $file, $extension, FilesystemAdapter $filesystemAdapter)
+    public function upload($context, $file, $extension, FilesystemAdapter $filesystemAdapter, $fileName)
     {
         // Upload original image
         $fileName = $this->fileManager->setFileSystemAdapter($filesystemAdapter)
-            ->uploadFile($file, $extension, $context);
+            ->uploadFile($file, $extension, $context, $fileName);
 
-        $this->processSizes($file, $fileName, $context, $extension, $filesystemAdapter);
+        try {
+            $this->processSizes($file, $fileName, $context, $extension, $filesystemAdapter);
+        } catch (\Exception $e) {
+            throw $e;
+        }
 
         return $fileName;
     }
