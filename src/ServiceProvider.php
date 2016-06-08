@@ -25,6 +25,8 @@ class ServiceProvider extends BaseProvider
             ],
             'icr'
         );
+
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang/', 'icr');
     }
 
     /**
