@@ -183,4 +183,27 @@ class Processor
 
         return $this;
     }
+
+    /**
+     * Renames existing file
+     *
+     * @param string $oldFileName
+     * @param string $newFileName
+     * @param string $context
+     * @param FilesystemAdapter $filesystemAdapter
+     *
+     * @return boolean
+     */
+    public function rename($oldFileName, $newFileName, $context, FilesystemAdapter $filesystemAdapter)
+    {
+        $filesystemAdapter->move($context . '/' . $oldFileName, $context . '/' . $newFileName);
+
+        foreach ($this->config[$context] as $sizeName => $value) {
+            $oldPath = $context . '/' . $sizeName . '/' . $oldFileName;
+            $newPath = $context . '/' . $sizeName . '/' . $newFileName;
+            $filesystemAdapter->move($oldPath, $newPath);
+        }
+
+        return true;
+    }
 }
