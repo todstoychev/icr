@@ -2,8 +2,8 @@
 
 namespace Todstoychev\Icr;
 
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Facades;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -27,14 +27,14 @@ class Icr
      */
     public static function uploadImage(UploadedFile $uploadedFile, $context, $storage = 'local', $fileName = null)
     {
-        $file = File::get($uploadedFile);
+        $file = Facades\File::get($uploadedFile);
         /** @var Processor $processor */
         $processor = app('icr.processor');
         return $processor->upload(
             $context,
             $file,
             $uploadedFile->getClientOriginalExtension(),
-            Storage::disk($storage),
+            Facades\Storage::disk($storage),
             $fileName
         );
     }
@@ -53,6 +53,26 @@ class Icr
         /** @var Processor $processor */
         $processor = app('icr.processor');
 
-        return $processor->delete($fileName, $context, Storage::disk($storage));
+        return $processor->delete($fileName, $context, Facades\Storage::disk($storage));
+    }
+
+    /**
+     * Renames existing image
+     *
+     * @param string $oldFileName
+     * @param string $newFileName
+     * @param string $context
+     * @param string $storage
+     *
+     * @return boolean
+     */
+    public static function renameImage($oldFileName, $newFileName, $context, $storage = 'local')
+    {
+        /** @var FilesystemAdapter $filesystemAdapter */
+        $filesystemAdapter = Facades\Storage::disk($storage);
+        /** @var Processor $processor */
+        $processor = app('icr.processor');
+
+        return $processor->rename($oldFileName, $newFileName, $context, $filesystemAdapter);
     }
 }
