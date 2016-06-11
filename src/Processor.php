@@ -4,6 +4,7 @@ namespace Todstoychev\Icr;
 
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Config;
+use Todstoychev\Icr\Exception\IcrRuntimeException;
 use Todstoychev\Icr\Handler\OpenImageHandler;
 use Todstoychev\Icr\Manager\FileManager;
 use Todstoychev\Icr\Manipulator\ManipulatorFactory;
@@ -182,5 +183,32 @@ class Processor
         }
 
         return $this;
+    }
+
+    /**
+     * Renames existing file
+     *
+     * @param string $oldFileName
+     * @param string $newFileName
+     * @param string $context
+     * @param FilesystemAdapter $filesystemAdapter
+     *
+     * @return boolean
+     */
+    public function rename($oldFileName, $newFileName, $context, FilesystemAdapter $filesystemAdapter)
+    {
+        if ($filesystemAdapter->exists($context . '/' . $newFileName)) {
+            throw new IcrRuntimeException("File with name {$newFileName} already exists!");
+        }
+
+        $image = $filesystemAdapter->get($context . '/' . $oldFileName);
+
+        foreach ($this->config[$context] as $sizeName => $value) {
+            $oldPath = $context . '/' . $sizeName . '/' . $oldFileName;
+            $newPath = $context . '/' . $sizeName . '/' . $newFileName;
+            $filesystemAdapter->move($oldPath, $newPath);
+        }
+
+        return true;
     }
 }
