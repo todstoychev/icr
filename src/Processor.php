@@ -201,7 +201,7 @@ class Processor
             throw new IcrRuntimeException("File with name {$newFileName} already exists!");
         }
 
-        $filesystemAdapter->move($context . '/' . $oldFileName, $context . '/' . $newFileName);
+        $image = $filesystemAdapter->get($context . '/' . $oldFileName);
 
         foreach ($this->config[$context] as $sizeName => $value) {
             $oldPath = $context . '/' . $sizeName . '/' . $oldFileName;
