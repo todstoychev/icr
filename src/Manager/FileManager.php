@@ -53,6 +53,7 @@ class FileManager
             $hash = $this->generate($this->filesystemAdapter, $extension, $path);
             $fileName = $hash . '.' . $extension;
         } else {
+            $fileName = preg_replace('/\.[A-z]{3,4}$/', '',$fileName);
             $fileName = $fileName . '.' . $extension;
         }
         
