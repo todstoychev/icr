@@ -53,11 +53,13 @@ class FileManager
             $hash = $this->generate($this->filesystemAdapter, $extension, $path);
             $fileName = $hash . '.' . $extension;
         } else {
-            $imageExists = $this->filesystemAdapter->exists($path . '/' . $fileName);
+            $fileName = $fileName . '.' . $extension;
+        }
+        
+        $imageExists = $this->filesystemAdapter->exists($path . '/' . $fileName);
 
-            if ($imageExists) {
-                throw new \RuntimeException("Image {$fileName} already exists at path {$path}");
-            }
+        if ($imageExists) {
+            throw new \RuntimeException("Image {$fileName} already exists at path {$path}");
         }
 
         $path = $path . $fileName;
