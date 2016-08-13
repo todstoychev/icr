@@ -33,7 +33,7 @@ class Icr
         return $processor->upload(
             $context,
             $file,
-            $uploadedFile->getClientOriginalExtension(),
+            $uploadedFile->getExtension(),
             Facades\Storage::disk($storage),
             $fileName
         );
