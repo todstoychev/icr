@@ -202,6 +202,7 @@ class Processor
         }
 
         $image = $filesystemAdapter->get($context . '/' . $oldFileName);
+        $filesystemAdapter->move($context . '/' . $oldFileName, $context . '/' . $newFileName);
 
         foreach ($this->config[$context] as $sizeName => $value) {
             $oldPath = $context . '/' . $sizeName . '/' . $oldFileName;
